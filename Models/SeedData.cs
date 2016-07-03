@@ -31,6 +31,15 @@ namespace Community.Models
 
                      new Event
                      {
+                         Title = "Transformers",
+                         Date = DateTime.Parse("2000-1-11"),
+                         Location = "Texas",
+                         Price = 7.99M,
+                         Creator = "Jennifer"
+                     },
+
+                     new Event
+                     {
                          Title = "Ghostbusters ",
                          Date = DateTime.Parse("1984-3-13"),
                          Location = "New York",
