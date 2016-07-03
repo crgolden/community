@@ -20,9 +20,31 @@ namespace Community.Controllers
         }
 
         // GET: Events
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string eventLocation, string searchString)
         {
-            return View(await _context.Event.ToListAsync());
+            var events = from e in _context.Event
+                         select e;
+
+            // Use LINQ to get list of locations.
+            IQueryable<string> locationQuery = from e in _context.Event
+                                            orderby e.Location
+                                            select e.Location;
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                events = events.Where(s => s.Title.Contains(searchString));
+            }
+
+            if (!string.IsNullOrEmpty(eventLocation))
+            {
+                events = events.Where(x => x.Location == eventLocation);
+            }
+
+            var eventLocationVM = new EventLocationViewModel();
+            eventLocationVM.locations = new SelectList(await locationQuery.Distinct().ToListAsync());
+            eventLocationVM.events = await events.ToListAsync();
+
+            return View(eventLocationVM);
         }
 
         // GET: Events/Details/5
@@ -53,7 +75,7 @@ namespace Community.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Date,Location,Price,Title")] Event @event)
+        public async Task<IActionResult> Create([Bind("ID,Date,Location,Price,Title,Creator")] Event @event)
         {
             if (ModelState.IsValid)
             {
@@ -85,7 +107,7 @@ namespace Community.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Date,Location,Price,Title")] Event @event)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,Date,Location,Price,Title,Creator")] Event @event)
         {
             if (id != @event.ID)
             {
@@ -133,9 +155,8 @@ namespace Community.Controllers
         }
 
         // POST: Events/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id, bool notUsed)
         {
             var @event = await _context.Event.SingleOrDefaultAsync(m => m.ID == id);
             _context.Event.Remove(@event);
