@@ -9,10 +9,10 @@ module.exports = function(config) {
           'lib/angular-route/angular-route.js',
           'lib/angular-resource/angular-resource.js',
           'lib/angular-mocks/angular-mocks.js',
-          'app/**/*.module.js',
-          'app/*!(.module|.spec).js',
+          'events-app/**/*.module.js',
+          'events-app/*!(.module|.spec).js',
           '!(lib)/**/*!(.module|.spec).js',
-          'app/**/*.spec.js'
+          'events-app/**/*.spec.js'
         ],
 
         autoWatch: true,

@@ -5,15 +5,10 @@
 
 describe('Community Application', function () {
 
-    it('should redirect `#!/index.html` to `#!/', function () {
-        browser.get('http://localhost:9052/#!/index.html');
-        expect(browser.getLocationAbsUrl()).toBe('/');
-    });
-
     describe('View: Event list', function () {
 
         beforeEach(function () {
-            browser.get('#!/events');
+            browser.get('events');
         });
 
         it('should filter the event list as a user types into the search box', function () {
@@ -70,7 +65,7 @@ describe('Community Application', function () {
     describe('View: Event detail', function () {
 
         beforeEach(function () {
-            browser.get('#!/events/nexus-s');
+            browser.get('events/nexus-s');
         });
 
         it('should display the `nexus-s` page', function () {

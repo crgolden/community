@@ -78,6 +78,14 @@ namespace Community
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
+
+                routes.MapRoute(
+                    name: "eventsApp",
+                    template: "{controller=Events}/{*.url}",
+                    defaults: new
+                    {
+                        action = "Index"
+                    });
             });
 
             SeedData.Initialize(app.ApplicationServices);

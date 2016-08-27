@@ -1,24 +1,26 @@
 //jshint strict: false
 exports.config = {
 
-  allScriptsTimeout: 11000,
+    allScriptsTimeout: 11000,
 
-  specs: [
-    '*.js'
-  ],
+    specs: [
+      '*.js'
+    ],
 
-  capabilities: {
-    'browserName': 'chrome'
-  },
+    rootElement: '[ng-app]',
 
-  baseUrl: 'http://localhost:9052/',
+    capabilities: {
+        'browserName': 'chrome'
+    },
 
-  framework: 'jasmine',
+    baseUrl: 'http://localhost:9052/',
 
-  jasmineNodeOpts: {
-    defaultTimeoutInterval: 30000
-  },
+    framework: 'jasmine',
 
-  seleniumAddress: 'http://localhost:4444/wd/hub'
-  
+    jasmineNodeOpts: {
+        defaultTimeoutInterval: 30000
+    },
+
+    seleniumAddress: 'http://localhost:4444/wd/hub'
+
 };
