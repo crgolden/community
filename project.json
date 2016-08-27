@@ -1,4 +1,4 @@
-﻿{
+{
   "userSecretsId": "aspnet-Community-ee102e28-06cd-42a7-8ad7-f89d43e9fe44",
 
   "dependencies": {
@@ -42,7 +42,8 @@
     "Microsoft.VisualStudio.Web.CodeGenerators.Mvc": {
       "version": "1.0.0-preview2-final",
       "type": "build"
-    }
+    },
+    "NuGet.CommandLine": "3.4.3"
   },
 
   "tools": {

@@ -1,0 +1,14 @@
+{
+  "name": "community",
+  "version": "1.0.0",
+  "description": "simple app to learn angularjs",
+  "scripts": {
+    "test": "karma start karma.conf.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deeprog/community.git"
+  },
+  "author": "",
+  "license": "ISC"
+}
