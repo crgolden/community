@@ -5,7 +5,7 @@ namespace Community.Models
 {
     public class Event
     {
-        public int ID { get; set; }
+        public int Id { get; set; }
         [StringLength(75, MinimumLength = 3)]
         public string Title { get; set; }
         [Display(Name = "Release Date"), DataType(DataType.Date)]
@@ -16,6 +16,6 @@ namespace Community.Models
         [Range(1, 100), DataType(DataType.Currency)]
         public decimal Price { get; set; }
         [RegularExpression(@"^[A-Z]+[a-zA-Z''-'\s]*$"), StringLength(5)]
-        public string Creator { get; set; }
+        public ApplicationUser Creator { get; set; }
     }
 }

@@ -4,23 +4,23 @@ exports.config = {
     allScriptsTimeout: 11000,
 
     specs: [
-      '*.js'
+      "*.js"
     ],
 
-    rootElement: '[ng-app]',
+    rootElement: "[ng-app]",
 
     capabilities: {
-        'browserName': 'chrome'
+        'browserName': "chrome"
     },
 
-    baseUrl: 'http://localhost:9052/',
+    baseUrl: "http://localhost:5000/",
 
-    framework: 'jasmine',
+    framework: "jasmine",
 
     jasmineNodeOpts: {
         defaultTimeoutInterval: 30000
     },
 
-    seleniumAddress: 'http://localhost:4444/wd/hub'
+    seleniumAddress: "http://localhost:4444/wd/hub"
 
 };

@@ -1,13 +1,14 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Community.Data;
+using Community.Models;
+using Community.Services;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Community.Data;
-using Community.Models;
-using Community.Services;
 
 namespace Community
 {
@@ -37,7 +38,7 @@ namespace Community
         {
             // Add framework services.
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlite(Configuration.GetConnectionString("OSXConnection")));
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -68,7 +69,6 @@ namespace Community
             }
 
             app.UseStaticFiles();
-
             app.UseIdentity();
 
             // Add external authentication middleware below. To configure them please see http://go.microsoft.com/fwlink/?LinkID=532715
@@ -78,17 +78,20 @@ namespace Community
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
-
-                routes.MapRoute(
-                    name: "eventsApp",
-                    template: "{controller=Events}/{*.url}",
-                    defaults: new
-                    {
-                        action = "Index"
-                    });
             });
 
-            SeedData.Initialize(app.ApplicationServices);
+            if (env.IsDevelopment())
+            {
+                using (var userManager = app.ApplicationServices.GetService<UserManager<ApplicationUser>>())
+                using (var context = new ApplicationDbContext(
+                    app.ApplicationServices.GetRequiredService<DbContextOptions<ApplicationDbContext>>()))
+                {
+                    var seedData = new SeedData(context, Configuration);
+                    seedData.SeedRoles().Wait();
+                    seedData.SeedUsers(userManager).Wait();
+                    seedData.SeedEvents();
+                }
+            }
         }
     }
 }
