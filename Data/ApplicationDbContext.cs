@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using System.Runtime.InteropServices;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Community.Models;
 
@@ -20,7 +21,10 @@ namespace Community.Data
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Filename=./community.db");
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                optionsBuilder.UseSqlite("Filename=./community.db");
+            }
         }
 
         public DbSet<Event> Events { get; set; }

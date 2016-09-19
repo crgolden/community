@@ -47,12 +47,18 @@ namespace Community.Data
 
         public async Task SeedUsers(UserManager<ApplicationUser> userManager)
         {
-            var adminEmail = _configuration["AppKeys:AdminEmail"];
-            var adminPassword = _configuration["AppKeys:AdminPassword"];
+            var adminEmail = _configuration["AdminEmail"];
+            var adminPassword = _configuration["AdminPassword"];
             var users = new List<ApplicationUser>()
             {
                 new ApplicationUser()
                 {
+                    NormalizedEmail = adminEmail.ToUpper(),
+                    NormalizedUserName = adminEmail.ToUpper(),
+                    PhoneNumber = "+923366633352",
+                    EmailConfirmed = true,
+                    PhoneNumberConfirmed = true,
+                    SecurityStamp = Guid.NewGuid().ToString("D"),
                     Email = adminEmail,
                     UserName = adminEmail
                 },

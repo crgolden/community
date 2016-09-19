@@ -1,4 +1,5 @@
-﻿using Community.Data;
+﻿using System.Runtime.InteropServices;
+using Community.Data;
 using Community.Models;
 using Community.Services;
 using Microsoft.AspNetCore.Builder;
@@ -37,8 +38,16 @@ namespace Community
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlite(Configuration.GetConnectionString("OSXConnection")));
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                services.AddDbContext<ApplicationDbContext>(options =>
+                    options.UseSqlServer(Configuration.GetConnectionString("WindowsConnection")));
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                services.AddDbContext<ApplicationDbContext>(options =>
+                    options.UseSqlite(Configuration.GetConnectionString("OSXConnection")));
+            }
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -80,17 +89,15 @@ namespace Community
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            if (env.IsDevelopment())
+            if (!env.IsDevelopment()) return;
+            using (var userManager = app.ApplicationServices.GetService<UserManager<ApplicationUser>>())
+            using (var context = new ApplicationDbContext(
+                app.ApplicationServices.GetRequiredService<DbContextOptions<ApplicationDbContext>>()))
             {
-                using (var userManager = app.ApplicationServices.GetService<UserManager<ApplicationUser>>())
-                using (var context = new ApplicationDbContext(
-                    app.ApplicationServices.GetRequiredService<DbContextOptions<ApplicationDbContext>>()))
-                {
-                    var seedData = new SeedData(context, Configuration);
-                    seedData.SeedRoles().Wait();
-                    seedData.SeedUsers(userManager).Wait();
-                    seedData.SeedEvents();
-                }
+                var seedData = new SeedData(context, Configuration);
+                seedData.SeedRoles().Wait();
+                seedData.SeedUsers(userManager).Wait();
+                seedData.SeedEvents();
             }
         }
     }

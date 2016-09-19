@@ -8,13 +8,14 @@ using Community.Data;
 namespace Community.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20160911005152_Initial")]
+    [Migration("20160919021802_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .HasAnnotation("ProductVersion", "1.0.0-rtm-21431");
+                .HasAnnotation("ProductVersion", "1.0.1")
+                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Community.Models.ApplicationUser", b =>
                 {
