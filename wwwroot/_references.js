@@ -19,6 +19,7 @@
 /// <reference path="js/events-app/events-app.animations.js" />
 /// <reference path="js/events-app/events-app.config.js" />
 /// <reference path="js/events-app/events-app.module.js" />
+/// <reference path="js/site.min.js" />
 /// <reference path="lib/angular/angular.js" />
 /// <reference path="lib/angular-animate/angular-animate.js" />
 /// <reference path="lib/angular-mocks/angular-mocks.js" />
