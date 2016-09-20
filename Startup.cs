@@ -89,7 +89,6 @@ namespace Community
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            if (!env.IsDevelopment()) return;
             using (var userManager = app.ApplicationServices.GetService<UserManager<ApplicationUser>>())
             using (var context = new ApplicationDbContext(
                 app.ApplicationServices.GetRequiredService<DbContextOptions<ApplicationDbContext>>()))
