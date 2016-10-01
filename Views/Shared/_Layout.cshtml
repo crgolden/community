@@ -6,6 +6,7 @@
     <title>@ViewData["Title"] - Community</title>
 
     <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+    <base href="/">
 </head>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -39,7 +40,9 @@
 
     <script src="js/site.min.js"></script>
     <script>
-        System.import('app').catch(function (err) { console.error(err); });
+        document.write('<base href="' + document.location + '" />');
+        System.import('app')
+            .then(null, console.error.bind(console));
     </script>
     @RenderSection("scripts", required: false)
 </body>

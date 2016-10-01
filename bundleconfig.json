@@ -12,20 +12,15 @@
   {
     "outputFileName": "wwwroot/js/site.min.js",
     "inputFiles": [
+      "node_modules/jquery/dist/jquery.js",
+      "node_modules/jquery-validation/dist/jquery.validate.js",
+      "node_modules/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js",
+      "node_modules/bootstrap/dist/js/bootstrap.js",
       "node_modules/core-js/client/shim.min.js",
       "node_modules/zone.js/dist/zone.js",
       "node_modules/reflect-metadata/Reflect.js",
       "node_modules/systemjs/dist/system.src.js",
-
-      "wwwroot/app/app.component.ts",
-      "wwwroot/app/app.module.ts",
-      "wwwroot/app/main.ts",
-
-      "systemjs.config.js",
-      "node_modules/jquery/dist/jquery.js",
-      "node_modules/jquery-validation/dist/jquery.validate.js",
-      "node_modules/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js",
-      "node_modules/bootstrap/dist/js/bootstrap.js"
+      "systemjs.config.js"
     ],
     // Optionally specify minification options
     "minify": {

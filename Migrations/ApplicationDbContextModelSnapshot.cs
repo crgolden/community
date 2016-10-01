@@ -70,22 +70,10 @@ namespace Community.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("CreatorId");
-
-                    b.Property<DateTime>("Date");
-
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasAnnotation("MaxLength", 30);
-
-                    b.Property<decimal>("Price");
-
                     b.Property<string>("Title")
                         .HasAnnotation("MaxLength", 75);
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CreatorId");
 
                     b.ToTable("Events");
                 });
@@ -195,13 +183,6 @@ namespace Community.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
-                });
-
-            modelBuilder.Entity("Community.Models.Event", b =>
-                {
-                    b.HasOne("Community.Models.ApplicationUser", "Creator")
-                        .WithMany("Events")
-                        .HasForeignKey("CreatorId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRoleClaim<string>", b =>

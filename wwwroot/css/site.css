@@ -1,50 +1,23 @@
-﻿body {
-    padding-top: 65px;
-    padding-bottom: 20px;
+﻿/* Master Styles */
+h1 {
+  color: #369;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 250%;
 }
-
-/* Wrapping element */
-/* Set some basic padding to keep content from hitting the edges */
-.body-content {
-    padding-left: 15px;
-    padding-right: 15px;
+h2, h3 {
+  color: #444;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: lighter;
 }
-
-/* Set widths on the form inputs since otherwise they're 100% wide */
-input,
-select,
-textarea {
-    max-width: 280px;
+body {
+  margin: 2em;
 }
-
-/* Carousel */
-.carousel-caption p {
-    font-size: 20px;
-    line-height: 1.4;
+body, input[text], button {
+  color: #888;
+  font-family: Cambria, Georgia;
 }
-
-/* buttons and links extension to use brackets: [ click me ] */
-.btn-bracketed::before {
-    display:inline-block;
-    content: "[";
-    padding-right: 0.5em;
-}
-.btn-bracketed::after {
-    display:inline-block;
-    content: "]";
-    padding-left: 0.5em;
-}
-
-/* Make .svg files in the carousel display properly in older browsers */
-.carousel-inner .item img[src$=".svg"]
-{
-    width: 100%;
-}
-
-/* Hide/rearrange for smaller screens */
-@media screen and (max-width: 767px) {
-  /* Hide captions */
-  .carousel-caption {
-    display: none
-  }
+/* . . . */
+/* everywhere else */
+* {
+  font-family: Arial, Helvetica, sans-serif;
 }

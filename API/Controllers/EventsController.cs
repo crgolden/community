@@ -26,7 +26,7 @@ namespace Community.API.Controllers
         }
 
         // GET api/values/5
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "GetEvent")]
         public IActionResult Get(int id)
         {
             var _event = _context.Events.FirstOrDefault(e => e.Id == id);
@@ -44,26 +44,26 @@ namespace Community.API.Controllers
         [HttpPost]
         public IActionResult Post([FromBody]Event _event)
         {
-            if (_event.Id == 0)
+            if (_event == null)
             {
-                _context.Events.Add(_event);
-                _context.SaveChanges();
-                return new ObjectResult(_event);
+                return BadRequest();
             }
-            else
-            {
-                var original = _context.Events.FirstOrDefault(e => e.Id == _event.Id);
-                original.Title = _event.Title;
-                original.Creator = _event.Creator;
-                _context.SaveChanges();
-                return new ObjectResult(original);
-            }
+            _context.Events.Add(_event);
+            _context.SaveChanges();
+            return CreatedAtRoute("GetEvent", new { id = _event.Id }, _event);
         }
 
         // PUT api/values/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        public IActionResult Put(int id, [FromBody]Event _event)
         {
+            if (_event == null || _event.Id != id)
+            {
+                return BadRequest();
+            }
+            _context.Events.Update(_event);
+            _context.SaveChanges();
+            return new NoContentResult();
         }
 
         // DELETE api/values/5
@@ -71,6 +71,10 @@ namespace Community.API.Controllers
         public IActionResult Delete(int id)
         {
             var _event = _context.Events.FirstOrDefault(e => e.Id == id);
+            if (_event.Equals(null))
+            {
+                return NotFound();
+            }
             _context.Events.Remove(_event);
             _context.SaveChanges();
             return new StatusCodeResult(200);

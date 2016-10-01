@@ -113,38 +113,23 @@ namespace Community.Data
             {
                 new Event
                 {
-                    Title = "When Harry Met Sally",
-                    Date = DateTime.Parse("1989-1-11"),
-                    Location = "Rome",
-                    Price = 7.99M
+                    Title = "When Harry Met Sally"
                 },
                 new Event
                 {
-                    Title = "Transformers",
-                    Date = DateTime.Parse("2000-1-11"),
-                    Location = "Texas",
-                    Price = 7.99M
+                    Title = "Transformers"
                 },
                 new Event
                 {
-                    Title = "Ghostbusters ",
-                    Date = DateTime.Parse("1984-3-13"),
-                    Location = "New York",
-                    Price = 8.99M
+                    Title = "Ghostbusters "
                 },
                 new Event
                 {
-                    Title = "Ghostbusters 2",
-                    Date = DateTime.Parse("1986-2-23"),
-                    Location = "Los Angeles",
-                    Price = 9.99M
+                    Title = "Ghostbusters 2"
                 },
                 new Event
                 {
-                    Title = "Rio Bravo",
-                    Date = DateTime.Parse("1959-4-15"),
-                    Location = "Denver",
-                    Price = 3.99M
+                    Title = "Rio Bravo"
                 }
             };
             foreach (var _event in events)

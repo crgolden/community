@@ -9,19 +9,21 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
-var AppComponent = (function () {
-    function AppComponent() {
-        this.title = 'Community';
+var http_1 = require('@angular/http');
+var EventSearchService = (function () {
+    function EventSearchService(http) {
+        this.http = http;
     }
-    AppComponent = __decorate([
-        core_1.Component({
-            selector: 'my-app',
-            templateUrl: 'app/app.component.html',
-            styleUrls: ['app/app.component.css']
-        }), 
-        __metadata('design:paramtypes', [])
-    ], AppComponent);
-    return AppComponent;
+    EventSearchService.prototype.search = function (term) {
+        return this.http
+            .get("events?searchString=" + term)
+            .map(function (r) { return r.json(); });
+    };
+    EventSearchService = __decorate([
+        core_1.Injectable(), 
+        __metadata('design:paramtypes', [http_1.Http])
+    ], EventSearchService);
+    return EventSearchService;
 }());
-exports.AppComponent = AppComponent;
-//# sourceMappingURL=app.component.js.map
+exports.EventSearchService = EventSearchService;
+//# sourceMappingURL=event-search.service.js.map

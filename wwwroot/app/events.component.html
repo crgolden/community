@@ -1,0 +1,24 @@
+﻿{{title}}
+<h2>My Events</h2>
+<div>
+    <label>Event title:</label> <input #eventTitle />
+    <button (click)="add(eventTitle.value); eventTitle.value=''">
+        Add
+    </button>
+</div>
+<ul class="events">
+    <li *ngFor="let event of events"
+        [class.selected]="event === selectedEvent"
+        (click)="onSelect(event)">
+        <span class="badge">{{event.id}}</span> {{event.title}}
+        <button class="delete" (click)="delete(event); $event.stopPropagation()">
+            x
+        </button>
+    </li>
+</ul>
+<div *ngIf="selectedEvent">
+    <h2>
+        {{selectedEvent.title | uppercase}} is my event
+    </h2>
+    <button (click)="gotoDetail()">View Details</button>
+</div>
