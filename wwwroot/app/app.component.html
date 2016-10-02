@@ -1,6 +1,37 @@
-﻿<h1>{{title}}</h1>
-<nav>
-    <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-    <a routerLink="/events" routerLinkActive="active">Events</a>
-</nav>
-<router-outlet></router-outlet>
+﻿<div class="container">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="jumbotron">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-offset-2 col-sm-8">
+                            <div class="container">
+                                <div class="row">
+                                    <ul class="list-group">
+                                        <li class="list-group-item">
+                                            <h2 align="center">
+                                                <ol class="breadcrumb">
+                                                    <li>
+                                                        <a [routerLink]="['dashboard']" routerLinkActive="active">Dashboard</a> |
+                                                        <a [routerLink]="['events']" routerLinkActive="active">Events</a>
+                                                    </li>
+                                                </ol>
+                                            </h2>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="row">
+                                    <ul class="list-group">
+                                        <li class="list-group-item">
+                                            <router-outlet></router-outlet>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

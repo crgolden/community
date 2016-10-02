@@ -16,11 +16,13 @@ var DashboardComponent = (function () {
         this.router = router;
         this.eventService = eventService;
         this.events = [];
+        this.slicedEvents = [];
     }
     DashboardComponent.prototype.ngOnInit = function () {
         var _this = this;
         this.eventService.getEvents()
-            .then(function (events) { return _this.events = events.slice(1, 5); });
+            .then(function (events) { return _this.events = events; })
+            .then(function (events) { return _this.slicedEvents = events.slice(1, 5); });
     };
     DashboardComponent.prototype.gotoDetail = function (event) {
         var link = ['/detail', event.id];

@@ -1,8 +1,5 @@
 ﻿<h3>Top Events</h3>
-<div class="grid grid-pad">
-    <div *ngFor="let event of events" (click)="gotoDetail(event)" class="col-1-4">
-        <div class="module event">
-            <h4>{{event.title}}</h4>
-        </div>
-    </div>
+Total events: {{events.length}}
+<div *ngFor="let event of slicedEvents" (click)="gotoDetail(event)">
+    <h4>{{event.title}}</h4>
 </div>

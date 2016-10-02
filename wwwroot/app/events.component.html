@@ -1,12 +1,11 @@
-﻿{{title}}
-<h2>My Events</h2>
+﻿<h3>My Events</h3>
 <div>
     <label>Event title:</label> <input #eventTitle />
     <button (click)="add(eventTitle.value); eventTitle.value=''">
         Add
     </button>
 </div>
-<ul class="events">
+<ul>
     <li *ngFor="let event of events"
         [class.selected]="event === selectedEvent"
         (click)="onSelect(event)">

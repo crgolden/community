@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
 export class DashboardComponent implements OnInit {
 
     events: Event[] = [];
+    slicedEvents: Event[] = [];
 
     constructor(
         private router: Router,
@@ -18,7 +19,8 @@ export class DashboardComponent implements OnInit {
     }
     ngOnInit(): void {
         this.eventService.getEvents()
-            .then(events => this.events = events.slice(1, 5));
+            .then(events => this.events = events)
+            .then(events => this.slicedEvents = events.slice(1, 5));
     }
 
     gotoDetail(event: Event): void {
