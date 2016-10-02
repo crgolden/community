@@ -101,7 +101,7 @@ namespace Community.Data
                         user.PasswordHash = passwordHasher.HashPassword(user, adminPassword);
                         await userManager.CreateAsync(user);
                         await userManager.AddClaimAsync(user, new Claim("CanEdit", "true"));
-                        await userManager.AddToRolesAsync(user, new string[] { "Administrator", "User" });
+                        await userManager.AddToRolesAsync(user, new[] { "Administrator", "User" });
                     }
                 }
             }
@@ -134,7 +134,10 @@ namespace Community.Data
             };
             foreach (var _event in events)
             {
-                _context.Events.Add(_event);
+                if (!_context.Events.Any(e => e.Title.Equals(_event.Title)))
+                {
+                    _context.Events.Add(_event);
+                }
             }
             _context.SaveChanges();
         }
