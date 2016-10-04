@@ -1,7 +1,5 @@
 "use strict";
 var router_1 = require('@angular/router');
-var events_component_1 = require('./events/events.component');
-var event_detail_component_1 = require('./event-detail/event-detail.component');
 var dashboard_component_1 = require('./dashboard/dashboard.component');
 var appRoutes = [
     {
@@ -10,16 +8,8 @@ var appRoutes = [
         pathMatch: 'full'
     },
     {
-        path: 'events',
-        component: events_component_1.EventsComponent
-    },
-    {
         path: 'dashboard',
         component: dashboard_component_1.DashboardComponent
-    },
-    {
-        path: 'detail/:id',
-        component: event_detail_component_1.EventDetailComponent
     }
 ];
 exports.routing = router_1.RouterModule.forRoot(appRoutes);

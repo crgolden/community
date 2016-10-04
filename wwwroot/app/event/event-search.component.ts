@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { EventSearchService } from './event-search.service';
-import { Event } from '../event/event';
+import { Event } from './event';
 @Component({
     moduleId: module.id,
     selector: 'event-search',

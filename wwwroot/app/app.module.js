@@ -11,9 +11,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 require('./rxjs-extensions');
 var core_1 = require('@angular/core');
 var platform_browser_1 = require('@angular/platform-browser');
-var forms_1 = require('@angular/forms');
 var app_component_1 = require('./app.component');
 var dashboard_component_1 = require('./dashboard/dashboard.component');
+var shared_module_1 = require('./shared/shared.module');
 var app_routing_1 = require('./app.routing');
 var event_module_1 = require('./event/event.module');
 var AppModule = (function () {
@@ -24,7 +24,7 @@ var AppModule = (function () {
             imports: [
                 platform_browser_1.BrowserModule,
                 event_module_1.EventModule,
-                forms_1.FormsModule,
+                shared_module_1.SharedModule,
                 app_routing_1.routing
             ],
             declarations: [

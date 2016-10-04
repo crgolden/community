@@ -9,30 +9,27 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
-var common_1 = require('@angular/common');
-var forms_1 = require('@angular/forms');
 var http_1 = require('@angular/http');
-var events_component_1 = require('../events/events.component');
-var event_detail_component_1 = require('../event-detail/event-detail.component');
-var event_search_component_1 = require('../event-search/event-search.component');
-var event_service_1 = require('../event/event.service');
+var shared_module_1 = require('../shared/shared.module');
+var event_detail_component_1 = require('./event-detail.component');
+var event_list_component_1 = require('./event-list.component');
+var event_search_component_1 = require('./event-search.component');
+var event_service_1 = require('./event.service');
+var event_routing_1 = require('./event.routing');
 var EventModule = (function () {
     function EventModule() {
     }
     EventModule = __decorate([
         core_1.NgModule({
             imports: [
-                common_1.CommonModule,
-                forms_1.FormsModule,
-                http_1.HttpModule
+                shared_module_1.SharedModule,
+                http_1.HttpModule,
+                event_routing_1.eventRouting
             ],
             declarations: [
-                events_component_1.EventsComponent,
                 event_detail_component_1.EventDetailComponent,
+                event_list_component_1.EventListComponent,
                 event_search_component_1.EventSearchComponent
-            ],
-            exports: [
-                events_component_1.EventsComponent
             ],
             providers: [
                 event_service_1.EventService

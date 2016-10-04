@@ -1,8 +1,6 @@
 ﻿import { ModuleWithProviders }  from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { EventsComponent }      from './events/events.component';
-import { EventDetailComponent }      from './event-detail/event-detail.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 const appRoutes: Routes = [
     {
@@ -11,16 +9,8 @@ const appRoutes: Routes = [
         pathMatch: 'full'
     },
     {
-        path: 'events',
-        component: EventsComponent
-    },
-    {
         path: 'dashboard',
         component: DashboardComponent
-    },
-    {
-        path: 'detail/:id',
-        component: EventDetailComponent
     }
 ];
 

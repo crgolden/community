@@ -1,26 +1,24 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 
-import { EventsComponent } from '../events/events.component';
-import { EventDetailComponent } from '../event-detail/event-detail.component';
-import { EventSearchComponent } from '../event-search/event-search.component';
-import { EventService } from '../event/event.service';
+import { SharedModule } from '../shared/shared.module';
+
+import { EventDetailComponent } from './event-detail.component';
+import { EventListComponent } from './event-list.component';
+import { EventSearchComponent } from './event-search.component';
+import { EventService } from './event.service';
+import { eventRouting } from './event.routing';
 
 @NgModule({
     imports: [
-        CommonModule,
-        FormsModule,
-        HttpModule
+        SharedModule,
+        HttpModule,
+        eventRouting
     ],
     declarations: [
-        EventsComponent,
         EventDetailComponent,
+        EventListComponent,
         EventSearchComponent
-    ],
-    exports: [
-        EventsComponent
     ],
     providers: [
         EventService

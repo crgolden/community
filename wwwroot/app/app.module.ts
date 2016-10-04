@@ -2,10 +2,10 @@
 
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { SharedModule } from './shared/shared.module'
 import { routing } from './app.routing';
 
 import { EventModule } from './event/event.module'
@@ -14,7 +14,7 @@ import { EventModule } from './event/event.module'
     imports: [
         BrowserModule,
         EventModule,
-        FormsModule,
+        SharedModule,
         routing
     ],
     declarations: [
