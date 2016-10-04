@@ -1,9 +1,9 @@
 ﻿import { ModuleWithProviders }  from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { EventsComponent }      from './events.component';
-import { EventDetailComponent }      from './event-detail.component';
-import { DashboardComponent } from './dashboard.component';
+import { EventsComponent }      from './events/events.component';
+import { EventDetailComponent }      from './event-detail/event-detail.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 const appRoutes: Routes = [
     {
         path: '',

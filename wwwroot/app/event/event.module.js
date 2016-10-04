@@ -8,35 +8,39 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-require('./rxjs-extensions');
 var core_1 = require('@angular/core');
-var platform_browser_1 = require('@angular/platform-browser');
+var common_1 = require('@angular/common');
 var forms_1 = require('@angular/forms');
-var app_component_1 = require('./app.component');
-var dashboard_component_1 = require('./dashboard/dashboard.component');
-var app_routing_1 = require('./app.routing');
-var event_module_1 = require('./event/event.module');
-var AppModule = (function () {
-    function AppModule() {
+var http_1 = require('@angular/http');
+var events_component_1 = require('../events/events.component');
+var event_detail_component_1 = require('../event-detail/event-detail.component');
+var event_search_component_1 = require('../event-search/event-search.component');
+var event_service_1 = require('../event/event.service');
+var EventModule = (function () {
+    function EventModule() {
     }
-    AppModule = __decorate([
+    EventModule = __decorate([
         core_1.NgModule({
             imports: [
-                platform_browser_1.BrowserModule,
-                event_module_1.EventModule,
+                common_1.CommonModule,
                 forms_1.FormsModule,
-                app_routing_1.routing
+                http_1.HttpModule
             ],
             declarations: [
-                app_component_1.AppComponent,
-                dashboard_component_1.DashboardComponent
+                events_component_1.EventsComponent,
+                event_detail_component_1.EventDetailComponent,
+                event_search_component_1.EventSearchComponent
             ],
-            providers: [],
-            bootstrap: [app_component_1.AppComponent]
+            exports: [
+                events_component_1.EventsComponent
+            ],
+            providers: [
+                event_service_1.EventService
+            ]
         }), 
         __metadata('design:paramtypes', [])
-    ], AppModule);
-    return AppModule;
+    ], EventModule);
+    return EventModule;
 }());
-exports.AppModule = AppModule;
-//# sourceMappingURL=app.module.js.map
+exports.EventModule = EventModule;
+//# sourceMappingURL=event.module.js.map

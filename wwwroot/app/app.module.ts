@@ -3,33 +3,25 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
-import { DashboardComponent } from './dashboard.component';
-import { EventsComponent } from './events.component';
-import { EventDetailComponent } from './event-detail.component';
-import { EventSearchComponent } from './event-search.component';
-import { EventService } from './event.service';
+import { DashboardComponent } from './dashboard/dashboard.component';
 import { routing } from './app.routing';
+
+import { EventModule } from './event/event.module'
 
 @NgModule({
     imports: [
         BrowserModule,
+        EventModule,
         FormsModule,
-        HttpModule,
         routing
     ],
     declarations: [
         AppComponent,
-        DashboardComponent,
-        EventDetailComponent,
-        EventSearchComponent,
-        EventsComponent
+        DashboardComponent
     ],
-    providers: [
-        EventService
-    ],
+    providers: [],
     bootstrap: [AppComponent]
 })
 export class AppModule {

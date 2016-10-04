@@ -3,12 +3,12 @@ import { Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { EventSearchService } from './event-search.service';
-import { Event } from './event';
+import { Event } from '../event/event';
 @Component({
     moduleId: module.id,
     selector: 'event-search',
-    templateUrl: 'event-search.component.html',
-    styleUrls: ['event-search.component.css'],
+    templateUrl: './event-search.component.html',
+    styleUrls: ['./event-search.component.css'],
     providers: [EventSearchService]
 })
 export class EventSearchComponent implements OnInit {

@@ -1,8 +1,8 @@
 "use strict";
 var router_1 = require('@angular/router');
-var events_component_1 = require('./events.component');
-var event_detail_component_1 = require('./event-detail.component');
-var dashboard_component_1 = require('./dashboard.component');
+var events_component_1 = require('./events/events.component');
+var event_detail_component_1 = require('./event-detail/event-detail.component');
+var dashboard_component_1 = require('./dashboard/dashboard.component');
 var appRoutes = [
     {
         path: '',

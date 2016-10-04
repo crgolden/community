@@ -1,12 +1,12 @@
 ﻿import { Component, OnInit } from '@angular/core';
-import { Event } from './event';
-import { EventService } from './event.service';
+import { Event } from '../event/event';
+import { EventService } from '../event/event.service';
 import { Router } from '@angular/router';
 
 @Component({
     selector: 'my-dashboard',
-    templateUrl: 'app/dashboard.component.html',
-    styleUrls: ['app/dashboard.component.css']
+    templateUrl: './app/dashboard/dashboard.component.html',
+    styleUrls: ['./app/dashboard/dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
 

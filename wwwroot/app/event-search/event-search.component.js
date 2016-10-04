@@ -45,8 +45,8 @@ var EventSearchComponent = (function () {
         core_1.Component({
             moduleId: module.id,
             selector: 'event-search',
-            templateUrl: 'event-search.component.html',
-            styleUrls: ['event-search.component.css'],
+            templateUrl: './event-search.component.html',
+            styleUrls: ['./event-search.component.css'],
             providers: [event_search_service_1.EventSearchService]
         }), 
         __metadata('design:paramtypes', [event_search_service_1.EventSearchService, router_1.Router])
