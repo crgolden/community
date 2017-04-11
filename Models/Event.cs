@@ -1,12 +1,26 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 
 namespace Community.Models
 {
     public class Event
     {
-        public int Id { get; set; }
-        [StringLength(75, MinimumLength = 3)]
-        public string Title { get; set; }
+        public string Id { get; set; }
+        public int IdInt { get; set; }
+        public string Name { get; set; }
+        public string Details { get; set; }
+        public string Date { get; set; }
+        public string Time { get; set; }
+        public int CreatorId { get; set; }
+        public ApplicationUser Creator { get; set; }
+        public int AddressId { get; set; }
+        public Address Address { get; set; }
+        public ICollection<EventAttending> Attenders { get; set; }
+        public ICollection<EventFollowing> Followers { get; set; }
+
+        public Event()
+        {
+            Id = Guid.NewGuid().ToString("D");
+        }
     }
 }
