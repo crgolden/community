@@ -36,20 +36,17 @@ namespace Community.Data
                 .Property(p => p.IdInt)
                 .ValueGeneratedOnAdd();
             address
-                .HasKey(p => p.IdInt);
-            address
                 .HasKey(p => p.Id)
                 .ForSqlServerIsClustered(false);
             address
+                .HasAlternateKey(p => p.IdInt);
+            address
+                .HasIndex(p => p.IdInt)
+                .IsUnique();
+            address
                 .HasOne(p => p.Creator)
                 .WithMany(p => p.Addresses)
-                .HasForeignKey(p => p.CreatorId)
-                .HasPrincipalKey(p => p.IdInt)
-                .OnDelete(DeleteBehavior.Restrict);
-            address
-                .HasMany(p => p.Events)
-                .WithOne(p => p.Address)
-                .HasForeignKey(p => p.AddressId)
+                .HasForeignKey(p => p.CreatorIdInt)
                 .HasPrincipalKey(p => p.IdInt)
                 .OnDelete(DeleteBehavior.Restrict);
         }
@@ -61,53 +58,36 @@ namespace Community.Data
                 .Property(p => p.IdInt)
                 .ValueGeneratedOnAdd();
             applicationUser
-                .HasKey(p => p.IdInt);
-            applicationUser
                 .HasKey(p => p.Id)
                 .ForSqlServerIsClustered(false);
             applicationUser
-                .HasMany(p => p.Addresses)
-                .WithOne(p => p.Creator)
-                .HasForeignKey(p => p.CreatorId)
-                .HasPrincipalKey(p => p.IdInt)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasAlternateKey(p => p.IdInt);
             applicationUser
-                .HasMany(p => p.Events)
-                .WithOne(p => p.Creator)
-                .HasForeignKey(p => p.CreatorId)
-                .HasPrincipalKey(p => p.IdInt)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasIndex(p => p.IdInt)
+                .IsUnique();
             applicationUser
-                .HasMany(p => p.AttendedEvents)
-                .WithOne(p => p.Attender)
-                .HasForeignKey(p => p.AttendedEventId)
-                .HasPrincipalKey(p => p.IdInt)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasMany(p => p.AttendedEvents);
             applicationUser
-                .HasMany(p => p.FollowedEvents)
-                .WithOne(p => p.Follower)
-                .HasForeignKey(p => p.FollowedEventId)
-                .HasPrincipalKey(p => p.IdInt)
-                .OnDelete(DeleteBehavior.Restrict);
-            applicationUser
-                .HasMany(p => p.FollowedUsers)
-                .WithOne(p => p.Follower)
-                .HasForeignKey(p => p.FollowedUserId)
-                .HasPrincipalKey(p => p.IdInt)
-                .OnDelete(DeleteBehavior.Restrict);
-            applicationUser
-                .HasMany(p => p.Followers)
-                .WithOne(p => p.FollowedUser)
-                .HasForeignKey(p => p.FollowerId)
-                .HasPrincipalKey(p => p.IdInt)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasMany(p => p.FollowedEvents);
         }
 
         private static void SetupApplicationUserFollowing(ModelBuilder builder)
         {
             var applicationUserFollowing = builder.Entity<ApplicationUserFollowing>();
             applicationUserFollowing
-                .HasKey(p => new {p.FollowedUserId, p.FollowerId});
+                .HasKey(p => new {p.FollowedUserIdInt, p.FollowerIdInt});
+            applicationUserFollowing
+                .HasOne(p => p.FollowedUser)
+                .WithMany(p => p.Followers)
+                .HasForeignKey(p => p.FollowerIdInt)
+                .HasPrincipalKey(p => p.IdInt)
+                .OnDelete(DeleteBehavior.Restrict);
+            applicationUserFollowing
+                .HasOne(p => p.Follower)
+                .WithMany(p => p.FollowedUsers)
+                .HasForeignKey(p => p.FollowedUserIdInt)
+                .HasPrincipalKey(p => p.IdInt)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
         private static void SetupEvent(ModelBuilder builder)
@@ -117,40 +97,39 @@ namespace Community.Data
                 .Property(p => p.IdInt)
                 .ValueGeneratedOnAdd();
             @event
-                .HasKey(p => p.IdInt);
-            @event
                 .HasKey(p => p.Id)
                 .ForSqlServerIsClustered(false);
             @event
+                .HasAlternateKey(p => p.IdInt);
+            @event
+                .HasIndex(p => p.IdInt)
+                .IsUnique();
+            @event
                 .HasOne(p => p.Creator)
                 .WithMany(p => p.Events)
-                .HasForeignKey(p => p.CreatorId)
+                .HasForeignKey(p => p.CreatorIdInt)
                 .HasPrincipalKey(p => p.IdInt)
                 .OnDelete(DeleteBehavior.Restrict);
             @event
                 .HasOne(p => p.Address)
                 .WithMany(p => p.Events)
-                .HasForeignKey(p => p.AddressId)
+                .HasForeignKey(p => p.AddressIdInt)
                 .HasPrincipalKey(p => p.IdInt)
                 .OnDelete(DeleteBehavior.Restrict);
-            @event
-                .HasMany(p => p.Attenders);
-            @event
-                .HasMany(p => p.Followers);
         }
 
         private static void SetupEventAttending(ModelBuilder builder)
         {
             var eventAttending = builder.Entity<EventAttending>();
             eventAttending
-                .HasKey(p => new {p.AttendedEventId, p.AttenderId});
+                .HasKey(p => new {p.AttendedEventIdInt, p.AttenderIdInt});
         }
 
         private static void SetupEventFollowing(ModelBuilder builder)
         {
             var eventFollowing = builder.Entity<EventFollowing>();
             eventFollowing
-                .HasKey(p => new {p.FollowedEventId, p.FollowerId});
+                .HasKey(p => new {p.FollowedEventIdInt, p.FollowerIdInt});
         }
     }
 }

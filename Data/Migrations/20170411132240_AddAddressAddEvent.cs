@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Community.Data.Migrations
 {
-    public partial class AddAddressesEvents : Migration
+    public partial class AddAddressAddEvent : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -72,7 +72,7 @@ namespace Community.Data.Migrations
                 {
                     Id = table.Column<string>(nullable: false),
                     City = table.Column<string>(nullable: true),
-                    CreatorId = table.Column<int>(nullable: false),
+                    CreatorIdInt = table.Column<int>(nullable: false),
                     Home = table.Column<bool>(nullable: false),
                     IdInt = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
@@ -89,8 +89,8 @@ namespace Community.Data.Migrations
                         .Annotation("SqlServer:Clustered", false);
                     table.UniqueConstraint("AK_Addresses_IdInt", x => x.IdInt);
                     table.ForeignKey(
-                        name: "FK_Addresses_AspNetUsers_CreatorId",
-                        column: x => x.CreatorId,
+                        name: "FK_Addresses_AspNetUsers_CreatorIdInt",
+                        column: x => x.CreatorIdInt,
                         principalTable: "AspNetUsers",
                         principalColumn: "IdInt",
                         onDelete: ReferentialAction.Restrict);
@@ -100,21 +100,21 @@ namespace Community.Data.Migrations
                 name: "UserFollowings",
                 columns: table => new
                 {
-                    FollowedUserId = table.Column<int>(nullable: false),
-                    FollowerId = table.Column<int>(nullable: false)
+                    FollowedUserIdInt = table.Column<int>(nullable: false),
+                    FollowerIdInt = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserFollowings", x => new { x.FollowedUserId, x.FollowerId });
+                    table.PrimaryKey("PK_UserFollowings", x => new { x.FollowedUserIdInt, x.FollowerIdInt });
                     table.ForeignKey(
-                        name: "FK_UserFollowings_AspNetUsers_FollowedUserId",
-                        column: x => x.FollowedUserId,
+                        name: "FK_UserFollowings_AspNetUsers_FollowedUserIdInt",
+                        column: x => x.FollowedUserIdInt,
                         principalTable: "AspNetUsers",
                         principalColumn: "IdInt",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_UserFollowings_AspNetUsers_FollowerId",
-                        column: x => x.FollowerId,
+                        name: "FK_UserFollowings_AspNetUsers_FollowerIdInt",
+                        column: x => x.FollowerIdInt,
                         principalTable: "AspNetUsers",
                         principalColumn: "IdInt",
                         onDelete: ReferentialAction.Restrict);
@@ -211,8 +211,8 @@ namespace Community.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
-                    AddressId = table.Column<int>(nullable: false),
-                    CreatorId = table.Column<int>(nullable: false),
+                    AddressIdInt = table.Column<int>(nullable: false),
+                    CreatorIdInt = table.Column<int>(nullable: false),
                     Date = table.Column<string>(nullable: true),
                     Details = table.Column<string>(nullable: true),
                     IdInt = table.Column<int>(nullable: false)
@@ -226,14 +226,14 @@ namespace Community.Data.Migrations
                         .Annotation("SqlServer:Clustered", false);
                     table.UniqueConstraint("AK_Events_IdInt", x => x.IdInt);
                     table.ForeignKey(
-                        name: "FK_Events_Addresses_AddressId",
-                        column: x => x.AddressId,
+                        name: "FK_Events_Addresses_AddressIdInt",
+                        column: x => x.AddressIdInt,
                         principalTable: "Addresses",
                         principalColumn: "IdInt",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Events_AspNetUsers_CreatorId",
-                        column: x => x.CreatorId,
+                        name: "FK_Events_AspNetUsers_CreatorIdInt",
+                        column: x => x.CreatorIdInt,
                         principalTable: "AspNetUsers",
                         principalColumn: "IdInt",
                         onDelete: ReferentialAction.Restrict);
@@ -243,23 +243,24 @@ namespace Community.Data.Migrations
                 name: "EventAttendings",
                 columns: table => new
                 {
-                    AttendedEventId = table.Column<int>(nullable: false),
-                    AttenderId = table.Column<int>(nullable: false),
-                    AttendedEventId1 = table.Column<string>(nullable: true)
+                    AttendedEventIdInt = table.Column<int>(nullable: false),
+                    AttenderIdInt = table.Column<int>(nullable: false),
+                    AttendedEventId = table.Column<string>(nullable: true),
+                    AttenderId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EventAttendings", x => new { x.AttendedEventId, x.AttenderId });
+                    table.PrimaryKey("PK_EventAttendings", x => new { x.AttendedEventIdInt, x.AttenderIdInt });
                     table.ForeignKey(
-                        name: "FK_EventAttendings_AspNetUsers_AttendedEventId",
+                        name: "FK_EventAttendings_Events_AttendedEventId",
                         column: x => x.AttendedEventId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "IdInt",
+                        principalTable: "Events",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_EventAttendings_Events_AttendedEventId1",
-                        column: x => x.AttendedEventId1,
-                        principalTable: "Events",
+                        name: "FK_EventAttendings_AspNetUsers_AttenderId",
+                        column: x => x.AttenderId,
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -268,31 +269,44 @@ namespace Community.Data.Migrations
                 name: "EventFollowings",
                 columns: table => new
                 {
-                    FollowedEventId = table.Column<int>(nullable: false),
-                    FollowerId = table.Column<int>(nullable: false),
-                    FollowedEventId1 = table.Column<string>(nullable: true)
+                    FollowedEventIdInt = table.Column<int>(nullable: false),
+                    FollowerIdInt = table.Column<int>(nullable: false),
+                    FollowedEventId = table.Column<string>(nullable: true),
+                    FollowerId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EventFollowings", x => new { x.FollowedEventId, x.FollowerId });
+                    table.PrimaryKey("PK_EventFollowings", x => new { x.FollowedEventIdInt, x.FollowerIdInt });
                     table.ForeignKey(
-                        name: "FK_EventFollowings_AspNetUsers_FollowedEventId",
+                        name: "FK_EventFollowings_Events_FollowedEventId",
                         column: x => x.FollowedEventId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "IdInt",
+                        principalTable: "Events",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_EventFollowings_Events_FollowedEventId1",
-                        column: x => x.FollowedEventId1,
-                        principalTable: "Events",
+                        name: "FK_EventFollowings_AspNetUsers_FollowerId",
+                        column: x => x.FollowerId,
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Addresses_CreatorId",
+                name: "IX_Addresses_CreatorIdInt",
                 table: "Addresses",
-                column: "CreatorId");
+                column: "CreatorIdInt");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Addresses_IdInt",
+                table: "Addresses",
+                column: "IdInt",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_IdInt",
+                table: "AspNetUsers",
+                column: "IdInt",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "EmailIndex",
@@ -306,29 +320,45 @@ namespace Community.Data.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserFollowings_FollowerId",
+                name: "IX_UserFollowings_FollowerIdInt",
                 table: "UserFollowings",
-                column: "FollowerId");
+                column: "FollowerIdInt");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Events_AddressId",
+                name: "IX_Events_AddressIdInt",
                 table: "Events",
-                column: "AddressId");
+                column: "AddressIdInt");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Events_CreatorId",
+                name: "IX_Events_CreatorIdInt",
                 table: "Events",
-                column: "CreatorId");
+                column: "CreatorIdInt");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EventAttendings_AttendedEventId1",
+                name: "IX_Events_IdInt",
+                table: "Events",
+                column: "IdInt",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EventAttendings_AttendedEventId",
                 table: "EventAttendings",
-                column: "AttendedEventId1");
+                column: "AttendedEventId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EventFollowings_FollowedEventId1",
+                name: "IX_EventAttendings_AttenderId",
+                table: "EventAttendings",
+                column: "AttenderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EventFollowings_FollowedEventId",
                 table: "EventFollowings",
-                column: "FollowedEventId1");
+                column: "FollowedEventId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EventFollowings_FollowerId",
+                table: "EventFollowings",
+                column: "FollowerId");
 
             migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",

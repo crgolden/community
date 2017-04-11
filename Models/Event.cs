@@ -11,9 +11,9 @@ namespace Community.Models
         public string Details { get; set; }
         public string Date { get; set; }
         public string Time { get; set; }
-        public int CreatorId { get; set; }
+        public int CreatorIdInt { get; set; }
         public ApplicationUser Creator { get; set; }
-        public int AddressId { get; set; }
+        public int AddressIdInt { get; set; }
         public Address Address { get; set; }
         public ICollection<EventAttending> Attenders { get; set; }
         public ICollection<EventFollowing> Followers { get; set; }

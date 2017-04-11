@@ -15,9 +15,9 @@ namespace Community.Data.Seed
         private readonly ApplicationDbContext _context;
         private readonly IConfigurationRoot _configuration;
         private readonly PasswordHasher<ApplicationUser> _passwordHasher;
-        private int _adminIntId, _jimIntId, _marleneIntId, _timIntId,
-            _yardBarIntId, _bullCreekDistrictParkIntId, _alamoDrafthouseCinemaIntId,
-            _drinksIntId, _softballIntId,  _moviesIntId;
+        private ApplicationUser _admin, _jim, _marlene, _tim;
+        private Address _yardBar, _bullCreekDistrictPark, _alamoDrafthouseCinema;
+        private Event _drinks, _softball, _movies;
 
         public Seed(ApplicationDbContext context, IConfigurationRoot configuration)
         {
@@ -89,16 +89,18 @@ namespace Community.Data.Seed
                     PhoneNumber = string.Empty,
                     PhoneNumberConfirmed = false
                 };
-                user.PasswordHash = _passwordHasher.HashPassword(user, "password");
 
                 await _context.Users.AddAsync(user);
                 await _context.SaveChangesAsync();
+
+                user.PasswordHash = _passwordHasher.HashPassword(user, "password");
+
                 await SeedUserRoles(user);
             }
 
-            _jimIntId = _context.Users.Single(u => u.Email == "jim@gmail.com").IdInt;
-            _marleneIntId = _context.Users.Single(u => u.Email == "marlene@gmail.com").IdInt;
-            _timIntId = _context.Users.Single(u => u.Email == "tim@gmail.com").IdInt;
+            _jim = _context.Users.Single(u => u.Email == "jim@gmail.com");
+            _marlene = _context.Users.Single(u => u.Email == "marlene@gmail.com");
+            _tim = _context.Users.Single(u => u.Email == "tim@gmail.com");
 
             await SeedUserFollowings();
         }
@@ -107,7 +109,7 @@ namespace Community.Data.Seed
         {
             var email = _configuration["AdminEmail"];
             var password = _configuration["AdminPassword"];
-            var admin = new ApplicationUser
+            _admin = new ApplicationUser
             {
                 Email = email,
                 NormalizedEmail = email.ToUpper(),
@@ -117,12 +119,13 @@ namespace Community.Data.Seed
                 PhoneNumber = "+12345678901",
                 PhoneNumberConfirmed = true
             };
-            admin.PasswordHash = _passwordHasher.HashPassword(admin, password);
-            _adminIntId = admin.IdInt;
 
-            await _context.Users.AddAsync(admin);
+            await _context.Users.AddAsync(_admin);
             await _context.SaveChangesAsync();
-            await SeedUserRoles(admin);
+
+            _admin.PasswordHash = _passwordHasher.HashPassword(_admin, password);
+
+            await SeedUserRoles(_admin);
         }
 
         private async Task SeedUserRoles(ApplicationUser user)
@@ -132,7 +135,7 @@ namespace Community.Data.Seed
             foreach (var role in _context.Roles)
                 if (role.Name == "Admin")
                 {
-                    if (user.IdInt == _adminIntId)
+                    if (user.IdInt == _admin.IdInt)
                         userRoles.Add(new IdentityUserRole<string>
                         {
                             RoleId = role.Id,
@@ -160,7 +163,7 @@ namespace Community.Data.Seed
             foreach (var claim in _context.RoleClaims)
                 if (claim.ClaimType == "Admin")
                 {
-                    if (user.IdInt == _adminIntId)
+                    if (user.IdInt == _admin.IdInt)
                         userClaims.Add(new IdentityUserClaim<string>
                         {
                             ClaimType = claim.ClaimType,
@@ -188,23 +191,23 @@ namespace Community.Data.Seed
             {
                 new ApplicationUserFollowing
                 {
-                    FollowedUserId = _jimIntId,
-                    FollowerId = _timIntId
+                    FollowedUserIdInt = _jim.IdInt,
+                    FollowerIdInt = _tim.IdInt
                 },
                 new ApplicationUserFollowing
                 {
-                    FollowedUserId = _jimIntId,
-                    FollowerId = _marleneIntId
+                    FollowedUserIdInt = _jim.IdInt,
+                    FollowerIdInt = _marlene.IdInt
                 },
                 new ApplicationUserFollowing
                 {
-                    FollowedUserId = _timIntId,
-                    FollowerId = _marleneIntId
+                    FollowedUserIdInt = _tim.IdInt,
+                    FollowerIdInt = _marlene.IdInt
                 },
                 new ApplicationUserFollowing
                 {
-                    FollowedUserId = _marleneIntId,
-                    FollowerId = _jimIntId
+                    FollowedUserIdInt = _marlene.IdInt,
+                    FollowerIdInt = _jim.IdInt
                 }
             };
 
@@ -226,7 +229,7 @@ namespace Community.Data.Seed
                     Latitude = address["Latitude"],
                     Longitude = address["Longitude"],
                     Home = bool.Parse(address["Home"]),
-                    CreatorId = _jimIntId
+                    CreatorIdInt = _jim.IdInt
                 }));
             addresses.AddRange(Addresses.MarleneAddresses.Select(address => new Address
             {
@@ -238,7 +241,7 @@ namespace Community.Data.Seed
                 Latitude = address["Latitude"],
                 Longitude = address["Longitude"],
                 Home = bool.Parse(address["Home"]),
-                CreatorId = _marleneIntId
+                CreatorIdInt = _marlene.IdInt
             }));
             addresses.AddRange(Addresses.TimAddresses.Select(address => new Address
             {
@@ -250,21 +253,18 @@ namespace Community.Data.Seed
                 Latitude = address["Latitude"],
                 Longitude = address["Longitude"],
                 Home = bool.Parse(address["Home"]),
-                CreatorId = _timIntId
+                CreatorIdInt = _tim.IdInt
             }));
 
             await _context.Addresses.AddRangeAsync(addresses);
             await _context.SaveChangesAsync();
 
-            _yardBarIntId = _context.Addresses
-                .Single(a => a.Latitude == "30.343087" && a.Longitude == "-97.739128")
-                .IdInt;
-            _bullCreekDistrictParkIntId = _context.Addresses
-                .Single(a => a.Latitude == "30.368693" && a.Longitude == "-97.784469")
-                .IdInt;
-            _alamoDrafthouseCinemaIntId = _context.Addresses
-                .Single(a => a.Latitude == "30.360028" && a.Longitude == "-97.734848")
-                .IdInt;
+            _yardBar = _context.Addresses
+                .Single(a => a.Latitude == "30.343087" && a.Longitude == "-97.739128");
+            _bullCreekDistrictPark = _context.Addresses
+                .Single(a => a.Latitude == "30.368693" && a.Longitude == "-97.784469");
+            _alamoDrafthouseCinema = _context.Addresses
+                .Single(a => a.Latitude == "30.360028" && a.Longitude == "-97.734848");
         }
 
         private async Task SeedEvents()
@@ -280,8 +280,8 @@ namespace Community.Data.Seed
                 Details = @event["Details"],
                 Date = date,
                 Time = time,
-                CreatorId = _jimIntId,
-                AddressId = _yardBarIntId
+                CreatorIdInt = _jim.IdInt,
+                AddressIdInt = _yardBar.IdInt
             }));
             events.AddRange(Events.MarleneEvents.Select(@event => new Event
             {
@@ -289,8 +289,8 @@ namespace Community.Data.Seed
                 Details = @event["Details"],
                 Date = date,
                 Time = time,
-                CreatorId = _marleneIntId,
-                AddressId = _bullCreekDistrictParkIntId
+                CreatorIdInt = _marlene.IdInt,
+                AddressIdInt = _bullCreekDistrictPark.IdInt
             }));
             events.AddRange(Events.TimEvents.Select(@event => new Event
             {
@@ -298,16 +298,16 @@ namespace Community.Data.Seed
                 Details = @event["Details"],
                 Date = date,
                 Time = time,
-                CreatorId = _timIntId,
-                AddressId = _alamoDrafthouseCinemaIntId
+                CreatorIdInt = _tim.IdInt,
+                AddressIdInt = _alamoDrafthouseCinema.IdInt
             }));
 
             await _context.Events.AddRangeAsync(events);
             await _context.SaveChangesAsync();
 
-            _drinksIntId = _context.Events.Single(e => e.Name == "Drinks").IdInt;
-            _softballIntId = _context.Events.Single(e => e.Name == "Softball").IdInt;
-            _moviesIntId = _context.Events.Single(e => e.Name == "Movies").IdInt;
+            _drinks = _context.Events.Single(e => e.Name == "Drinks");
+            _softball = _context.Events.Single(e => e.Name == "Softball");
+            _movies = _context.Events.Single(e => e.Name == "Movies");
 
             await SeedEventAttendings();
             await SeedEventFollowings();
@@ -319,28 +319,38 @@ namespace Community.Data.Seed
             {
                 new EventAttending
                 {
-                    AttenderId = _jimIntId,
-                    AttendedEventId = _drinksIntId
+                    AttenderId = _jim.Id,
+                    AttenderIdInt = _jim.IdInt,
+                    AttendedEventId = _drinks.Id,
+                    AttendedEventIdInt = _drinks.IdInt
                 },
                 new EventAttending
                 {
-                    AttenderId = _marleneIntId,
-                    AttendedEventId = _softballIntId
+                    AttenderId = _marlene.Id,
+                    AttenderIdInt = _marlene.IdInt,
+                    AttendedEventId = _softball.Id,
+                    AttendedEventIdInt = _softball.IdInt
                 },
                 new EventAttending
                 {
-                    AttenderId = _timIntId,
-                    AttendedEventId = _softballIntId
+                    AttenderId = _tim.Id,
+                    AttenderIdInt = _tim.IdInt,
+                    AttendedEventId = _softball.Id,
+                    AttendedEventIdInt = _softball.IdInt
                 },
                 new EventAttending
                 {
-                    AttenderId = _timIntId,
-                    AttendedEventId = _moviesIntId
+                    AttenderId = _tim.Id,
+                    AttenderIdInt = _tim.IdInt,
+                    AttendedEventId = _movies.Id,
+                    AttendedEventIdInt = _movies.IdInt
                 },
                 new EventAttending
                 {
-                    AttenderId = _jimIntId,
-                    AttendedEventId = _moviesIntId
+                    AttenderId = _jim.Id,
+                    AttenderIdInt = _jim.IdInt,
+                    AttendedEventId = _movies.Id,
+                    AttendedEventIdInt = _movies.IdInt
                 }
             };
 
@@ -354,23 +364,31 @@ namespace Community.Data.Seed
             {
                 new EventFollowing
                 {
-                    FollowedEventId = _drinksIntId,
-                    FollowerId = _timIntId
+                    FollowedEventId = _drinks.Id,
+                    FollowedEventIdInt = _drinks.IdInt,
+                    FollowerId = _tim.Id,
+                    FollowerIdInt = _tim.IdInt
                 },
                 new EventFollowing
                 {
-                    FollowedEventId = _drinksIntId,
-                    FollowerId = _marleneIntId
+                    FollowedEventId = _drinks.Id,
+                    FollowedEventIdInt = _drinks.IdInt,
+                    FollowerId = _marlene.Id,
+                    FollowerIdInt = _marlene.IdInt
                 },
                 new EventFollowing
                 {
-                    FollowedEventId = _moviesIntId,
-                    FollowerId = _marleneIntId
+                    FollowedEventId = _movies.Id,
+                    FollowedEventIdInt = _movies.IdInt,
+                    FollowerId = _marlene.Id,
+                    FollowerIdInt = _marlene.IdInt
                 },
                 new EventFollowing
                 {
-                    FollowedEventId = _softballIntId,
-                    FollowerId = _jimIntId
+                    FollowedEventId = _softball.Id,
+                    FollowedEventIdInt = _softball.IdInt,
+                    FollowerId = _jim.Id,
+                    FollowerIdInt = _jim.IdInt
                 }
             };
 

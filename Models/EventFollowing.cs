@@ -2,9 +2,11 @@
 {
     public class EventFollowing
     {
-        public int FollowerId { get; set; }
+        public string FollowerId { get; set; }
+        public int FollowerIdInt { get; set; }
         public ApplicationUser Follower { get; set; }
-        public int FollowedEventId { get; set; }
+        public string FollowedEventId { get; set; }
+        public int FollowedEventIdInt { get; set; }
         public Event FollowedEvent { get; set; }
     }
 }

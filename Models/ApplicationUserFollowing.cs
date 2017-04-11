@@ -2,9 +2,9 @@
 {
     public class ApplicationUserFollowing
     {
-        public int FollowerId { get; set; }
+        public int FollowerIdInt { get; set; }
         public ApplicationUser Follower { get; set; }
-        public int FollowedUserId { get; set; }
+        public int FollowedUserIdInt { get; set; }
         public ApplicationUser FollowedUser { get; set; }
     }
 }

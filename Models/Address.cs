@@ -15,7 +15,7 @@ namespace Community.Models
         public string Latitude { get; set; }
         public string Longitude { get; set; }
         public bool Home { get; set; }
-        public int CreatorId { get; set; }
+        public int CreatorIdInt { get; set; }
         public ApplicationUser Creator { get; set; }
         public ICollection<Event> Events { get; set; }
 
