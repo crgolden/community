@@ -18,7 +18,7 @@ namespace Community.Data.Migrations
 
             modelBuilder.Entity("Community.Models.Address", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("City");
@@ -42,8 +42,7 @@ namespace Community.Data.Migrations
 
                     b.Property<string>("ZipCode");
 
-                    b.HasKey("Id")
-                        .HasAnnotation("SqlServer:Clustered", false);
+                    b.HasKey("Id");
 
                     b.HasIndex("CreatorIndex");
 
@@ -94,8 +93,7 @@ namespace Community.Data.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256);
 
-                    b.HasKey("Id")
-                        .HasAnnotation("SqlServer:Clustered", false);
+                    b.HasKey("Id");
 
                     b.HasIndex("Index")
                         .IsUnique();
@@ -125,7 +123,7 @@ namespace Community.Data.Migrations
 
             modelBuilder.Entity("Community.Models.Event", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<int>("AddressIndex");
@@ -143,10 +141,7 @@ namespace Community.Data.Migrations
 
                     b.Property<string>("Time");
 
-                    b.HasKey("Id")
-                        .HasAnnotation("SqlServer:Clustered", false);
-
-                    b.HasAlternateKey("Index");
+                    b.HasKey("Id");
 
                     b.HasIndex("AddressIndex");
 
@@ -166,7 +161,7 @@ namespace Community.Data.Migrations
 
                     b.Property<string>("AttenderId");
 
-                    b.Property<string>("EventId");
+                    b.Property<Guid>("EventId");
 
                     b.HasKey("EventIndex", "AttenderIndex");
 
@@ -183,7 +178,7 @@ namespace Community.Data.Migrations
 
                     b.Property<int>("FollowerIndex");
 
-                    b.Property<string>("EventId");
+                    b.Property<Guid>("EventId");
 
                     b.Property<string>("FollowerId");
 
@@ -345,14 +340,16 @@ namespace Community.Data.Migrations
 
                     b.HasOne("Community.Models.Event", "Event")
                         .WithMany("Attenders")
-                        .HasForeignKey("EventId");
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Community.Models.EventFollower", b =>
                 {
                     b.HasOne("Community.Models.Event", "Event")
                         .WithMany("Followers")
-                        .HasForeignKey("EventId");
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Community.Models.ApplicationUser", "Follower")
                         .WithMany("FollowedEvents")

@@ -33,8 +33,7 @@ namespace Community.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AspNetUsers", x => x.Id)
-                        .Annotation("SqlServer:Clustered", false);
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                     table.UniqueConstraint("AK_AspNetUsers_Index", x => x.Index);
                 });
 
@@ -70,7 +69,7 @@ namespace Community.Data.Migrations
                 name: "Addresses",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
+                    Id = table.Column<Guid>(nullable: false),
                     City = table.Column<string>(nullable: true),
                     CreatorIndex = table.Column<int>(nullable: false),
                     Home = table.Column<bool>(nullable: false),
@@ -85,8 +84,7 @@ namespace Community.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Addresses", x => x.Id)
-                        .Annotation("SqlServer:Clustered", false);
+                    table.PrimaryKey("PK_Addresses", x => x.Id);
                     table.UniqueConstraint("AK_Addresses_Index", x => x.Index);
                     table.ForeignKey(
                         name: "FK_Addresses_AspNetUsers_CreatorIndex",
@@ -210,7 +208,7 @@ namespace Community.Data.Migrations
                 name: "Events",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
+                    Id = table.Column<Guid>(nullable: false),
                     AddressIndex = table.Column<int>(nullable: false),
                     CreatorIndex = table.Column<int>(nullable: false),
                     Date = table.Column<string>(nullable: true),
@@ -222,9 +220,7 @@ namespace Community.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Events", x => x.Id)
-                        .Annotation("SqlServer:Clustered", false);
-                    table.UniqueConstraint("AK_Events_Index", x => x.Index);
+                    table.PrimaryKey("PK_Events", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Events_Addresses_AddressIndex",
                         column: x => x.AddressIndex,
@@ -246,7 +242,7 @@ namespace Community.Data.Migrations
                     EventIndex = table.Column<int>(nullable: false),
                     AttenderIndex = table.Column<int>(nullable: false),
                     AttenderId = table.Column<string>(nullable: true),
-                    EventId = table.Column<string>(nullable: true)
+                    EventId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -262,7 +258,7 @@ namespace Community.Data.Migrations
                         column: x => x.EventId,
                         principalTable: "Events",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -271,7 +267,7 @@ namespace Community.Data.Migrations
                 {
                     EventIndex = table.Column<int>(nullable: false),
                     FollowerIndex = table.Column<int>(nullable: false),
-                    EventId = table.Column<string>(nullable: true),
+                    EventId = table.Column<Guid>(nullable: false),
                     FollowerId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
@@ -282,7 +278,7 @@ namespace Community.Data.Migrations
                         column: x => x.EventId,
                         principalTable: "Events",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_EventFollowers_AspNetUsers_FollowerId",
                         column: x => x.FollowerId,

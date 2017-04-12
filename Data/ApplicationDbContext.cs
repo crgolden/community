@@ -36,11 +36,6 @@ namespace Community.Data
                 .Property(p => p.Index)
                 .ValueGeneratedOnAdd();
             address
-                .HasKey(p => p.Id)
-                .ForSqlServerIsClustered(false);
-            address
-                .HasAlternateKey(p => p.Index);
-            address
                 .HasIndex(p => p.Index)
                 .IsUnique();
             address
@@ -57,11 +52,6 @@ namespace Community.Data
             applicationUser
                 .Property(p => p.Index)
                 .ValueGeneratedOnAdd();
-            applicationUser
-                .HasKey(p => p.Id)
-                .ForSqlServerIsClustered(false);
-            applicationUser
-                .HasAlternateKey(p => p.Index);
             applicationUser
                 .HasIndex(p => p.Index)
                 .IsUnique();
@@ -96,11 +86,6 @@ namespace Community.Data
             @event
                 .Property(p => p.Index)
                 .ValueGeneratedOnAdd();
-            @event
-                .HasKey(p => p.Id)
-                .ForSqlServerIsClustered(false);
-            @event
-                .HasAlternateKey(p => p.Index);
             @event
                 .HasIndex(p => p.Index)
                 .IsUnique();

@@ -5,7 +5,7 @@ namespace Community.Models
 {
     public class Event
     {
-        public string Id { get; set; }
+        public Guid Id { get; set; }
         public int Index { get; set; }
         public string Name { get; set; }
         public string Details { get; set; }
@@ -17,10 +17,5 @@ namespace Community.Models
         public Address Address { get; set; }
         public ICollection<EventAttender> Attenders { get; set; }
         public ICollection<EventFollower> Followers { get; set; }
-
-        public Event()
-        {
-            Id = Guid.NewGuid().ToString("D");
-        }
     }
 }

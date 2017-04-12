@@ -1,8 +1,10 @@
-﻿namespace Community.Models
+﻿using System;
+
+namespace Community.Models
 {
     public class EventAttender
     {
-        public string EventId { get; set; }
+        public Guid EventId { get; set; }
         public int EventIndex { get; set; }
         public Event Event { get; set; }
         public string AttenderId { get; set; }
