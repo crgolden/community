@@ -102,7 +102,7 @@ namespace Community.Data.Seed
             _marlene = _context.Users.Single(u => u.Email == "marlene@gmail.com");
             _tim = _context.Users.Single(u => u.Email == "tim@gmail.com");
 
-            await SeedUserFollowings();
+            await SeedUserFollowers();
         }
 
         private async Task SeedAdmin()
@@ -135,7 +135,7 @@ namespace Community.Data.Seed
             foreach (var role in _context.Roles)
                 if (role.Name == "Admin")
                 {
-                    if (user.IdInt == _admin.IdInt)
+                    if (user.Index == _admin.Index)
                         userRoles.Add(new IdentityUserRole<string>
                         {
                             RoleId = role.Id,
@@ -163,7 +163,7 @@ namespace Community.Data.Seed
             foreach (var claim in _context.RoleClaims)
                 if (claim.ClaimType == "Admin")
                 {
-                    if (user.IdInt == _admin.IdInt)
+                    if (user.Index == _admin.Index)
                         userClaims.Add(new IdentityUserClaim<string>
                         {
                             ClaimType = claim.ClaimType,
@@ -185,33 +185,33 @@ namespace Community.Data.Seed
             await _context.SaveChangesAsync();
         }
 
-        private async Task SeedUserFollowings()
+        private async Task SeedUserFollowers()
         {
-            var userFollowings = new List<ApplicationUserFollowing>
+            var userFollowers = new List<ApplicationUserFollower>
             {
-                new ApplicationUserFollowing
+                new ApplicationUserFollower
                 {
-                    FollowedUserIdInt = _jim.IdInt,
-                    FollowerIdInt = _tim.IdInt
+                    UserIndex = _jim.Index,
+                    FollowerIndex = _tim.Index
                 },
-                new ApplicationUserFollowing
+                new ApplicationUserFollower
                 {
-                    FollowedUserIdInt = _jim.IdInt,
-                    FollowerIdInt = _marlene.IdInt
+                    UserIndex = _jim.Index,
+                    FollowerIndex = _marlene.Index
                 },
-                new ApplicationUserFollowing
+                new ApplicationUserFollower
                 {
-                    FollowedUserIdInt = _tim.IdInt,
-                    FollowerIdInt = _marlene.IdInt
+                    UserIndex = _tim.Index,
+                    FollowerIndex = _marlene.Index
                 },
-                new ApplicationUserFollowing
+                new ApplicationUserFollower
                 {
-                    FollowedUserIdInt = _marlene.IdInt,
-                    FollowerIdInt = _jim.IdInt
+                    UserIndex = _marlene.Index,
+                    FollowerIndex = _jim.Index
                 }
             };
 
-            await _context.UserFollowings.AddRangeAsync(userFollowings);
+            await _context.UserFollowers.AddRangeAsync(userFollowers);
             await _context.SaveChangesAsync();
         }
 
@@ -229,7 +229,7 @@ namespace Community.Data.Seed
                     Latitude = address["Latitude"],
                     Longitude = address["Longitude"],
                     Home = bool.Parse(address["Home"]),
-                    CreatorIdInt = _jim.IdInt
+                    CreatorIndex = _jim.Index
                 }));
             addresses.AddRange(Addresses.MarleneAddresses.Select(address => new Address
             {
@@ -241,7 +241,7 @@ namespace Community.Data.Seed
                 Latitude = address["Latitude"],
                 Longitude = address["Longitude"],
                 Home = bool.Parse(address["Home"]),
-                CreatorIdInt = _marlene.IdInt
+                CreatorIndex = _marlene.Index
             }));
             addresses.AddRange(Addresses.TimAddresses.Select(address => new Address
             {
@@ -253,7 +253,7 @@ namespace Community.Data.Seed
                 Latitude = address["Latitude"],
                 Longitude = address["Longitude"],
                 Home = bool.Parse(address["Home"]),
-                CreatorIdInt = _tim.IdInt
+                CreatorIndex = _tim.Index
             }));
 
             await _context.Addresses.AddRangeAsync(addresses);
@@ -280,8 +280,8 @@ namespace Community.Data.Seed
                 Details = @event["Details"],
                 Date = date,
                 Time = time,
-                CreatorIdInt = _jim.IdInt,
-                AddressIdInt = _yardBar.IdInt
+                CreatorIndex = _jim.Index,
+                AddressIndex = _yardBar.Index
             }));
             events.AddRange(Events.MarleneEvents.Select(@event => new Event
             {
@@ -289,8 +289,8 @@ namespace Community.Data.Seed
                 Details = @event["Details"],
                 Date = date,
                 Time = time,
-                CreatorIdInt = _marlene.IdInt,
-                AddressIdInt = _bullCreekDistrictPark.IdInt
+                CreatorIndex = _marlene.Index,
+                AddressIndex = _bullCreekDistrictPark.Index
             }));
             events.AddRange(Events.TimEvents.Select(@event => new Event
             {
@@ -298,8 +298,8 @@ namespace Community.Data.Seed
                 Details = @event["Details"],
                 Date = date,
                 Time = time,
-                CreatorIdInt = _tim.IdInt,
-                AddressIdInt = _alamoDrafthouseCinema.IdInt
+                CreatorIndex = _tim.Index,
+                AddressIndex = _alamoDrafthouseCinema.Index
             }));
 
             await _context.Events.AddRangeAsync(events);
@@ -309,90 +309,90 @@ namespace Community.Data.Seed
             _softball = _context.Events.Single(e => e.Name == "Softball");
             _movies = _context.Events.Single(e => e.Name == "Movies");
 
-            await SeedEventAttendings();
-            await SeedEventFollowings();
+            await SeedEventAttenders();
+            await SeedEventFollowers();
         }
 
-        private async Task SeedEventAttendings()
+        private async Task SeedEventAttenders()
         {
-            var eventAttendings = new List<EventAttending>
+            var eventAttenders = new List<EventAttender>
             {
-                new EventAttending
+                new EventAttender
                 {
                     AttenderId = _jim.Id,
-                    AttenderIdInt = _jim.IdInt,
-                    AttendedEventId = _drinks.Id,
-                    AttendedEventIdInt = _drinks.IdInt
+                    AttenderIndex = _jim.Index,
+                    EventId = _drinks.Id,
+                    EventIndex = _drinks.Index
                 },
-                new EventAttending
+                new EventAttender
                 {
                     AttenderId = _marlene.Id,
-                    AttenderIdInt = _marlene.IdInt,
-                    AttendedEventId = _softball.Id,
-                    AttendedEventIdInt = _softball.IdInt
+                    AttenderIndex = _marlene.Index,
+                    EventId = _softball.Id,
+                    EventIndex = _softball.Index
                 },
-                new EventAttending
+                new EventAttender
                 {
                     AttenderId = _tim.Id,
-                    AttenderIdInt = _tim.IdInt,
-                    AttendedEventId = _softball.Id,
-                    AttendedEventIdInt = _softball.IdInt
+                    AttenderIndex = _tim.Index,
+                    EventId = _softball.Id,
+                    EventIndex = _softball.Index
                 },
-                new EventAttending
+                new EventAttender
                 {
                     AttenderId = _tim.Id,
-                    AttenderIdInt = _tim.IdInt,
-                    AttendedEventId = _movies.Id,
-                    AttendedEventIdInt = _movies.IdInt
+                    AttenderIndex = _tim.Index,
+                    EventId = _movies.Id,
+                    EventIndex = _movies.Index
                 },
-                new EventAttending
+                new EventAttender
                 {
                     AttenderId = _jim.Id,
-                    AttenderIdInt = _jim.IdInt,
-                    AttendedEventId = _movies.Id,
-                    AttendedEventIdInt = _movies.IdInt
+                    AttenderIndex = _jim.Index,
+                    EventId = _movies.Id,
+                    EventIndex = _movies.Index
                 }
             };
 
-            await _context.EventAttendings.AddRangeAsync(eventAttendings);
+            await _context.EventAttenders.AddRangeAsync(eventAttenders);
             await _context.SaveChangesAsync();
         }
 
-        private async Task SeedEventFollowings()
+        private async Task SeedEventFollowers()
         {
-            var eventFollowings = new List<EventFollowing>
+            var eventFollowers = new List<EventFollower>
             {
-                new EventFollowing
+                new EventFollower
                 {
-                    FollowedEventId = _drinks.Id,
-                    FollowedEventIdInt = _drinks.IdInt,
+                    EventId = _drinks.Id,
+                    EventIndex = _drinks.Index,
                     FollowerId = _tim.Id,
-                    FollowerIdInt = _tim.IdInt
+                    FollowerIndex = _tim.Index
                 },
-                new EventFollowing
+                new EventFollower
                 {
-                    FollowedEventId = _drinks.Id,
-                    FollowedEventIdInt = _drinks.IdInt,
+                    EventId = _drinks.Id,
+                    EventIndex = _drinks.Index,
                     FollowerId = _marlene.Id,
-                    FollowerIdInt = _marlene.IdInt
+                    FollowerIndex = _marlene.Index
                 },
-                new EventFollowing
+                new EventFollower
                 {
-                    FollowedEventId = _movies.Id,
-                    FollowedEventIdInt = _movies.IdInt,
+                    EventId = _movies.Id,
+                    EventIndex = _movies.Index,
                     FollowerId = _marlene.Id,
-                    FollowerIdInt = _marlene.IdInt
+                    FollowerIndex = _marlene.Index
                 },
-                new EventFollowing
+                new EventFollower
                 {
-                    FollowedEventId = _softball.Id,
-                    FollowedEventIdInt = _softball.IdInt,
+                    EventId = _softball.Id,
+                    EventIndex = _softball.Index,
                     FollowerId = _jim.Id,
-                    FollowerIdInt = _jim.IdInt
+                    FollowerIndex = _jim.Index
                 }
             };
 
-            await _context.EventFollowings.AddRangeAsync(eventFollowings);
+            await _context.EventFollowers.AddRangeAsync(eventFollowers);
             await _context.SaveChangesAsync();
         }
     }

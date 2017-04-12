@@ -8,8 +8,8 @@ using Community.Data;
 namespace Community.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20170411132240_AddAddressAddEvent")]
-    partial class AddAddressAddEvent
+    [Migration("20170412093622_AddEventAddress")]
+    partial class AddEventAddress
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -24,11 +24,11 @@ namespace Community.Data.Migrations
 
                     b.Property<string>("City");
 
-                    b.Property<int>("CreatorIdInt");
+                    b.Property<int>("CreatorIndex");
 
                     b.Property<bool>("Home");
 
-                    b.Property<int>("IdInt")
+                    b.Property<int>("Index")
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("Latitude");
@@ -46,9 +46,9 @@ namespace Community.Data.Migrations
                     b.HasKey("Id")
                         .HasAnnotation("SqlServer:Clustered", false);
 
-                    b.HasIndex("CreatorIdInt");
+                    b.HasIndex("CreatorIndex");
 
-                    b.HasIndex("IdInt")
+                    b.HasIndex("Index")
                         .IsUnique();
 
                     b.ToTable("Addresses");
@@ -69,7 +69,7 @@ namespace Community.Data.Migrations
 
                     b.Property<bool>("EmailConfirmed");
 
-                    b.Property<int>("IdInt")
+                    b.Property<int>("Index")
                         .ValueGeneratedOnAdd();
 
                     b.Property<bool>("LockoutEnabled");
@@ -98,7 +98,7 @@ namespace Community.Data.Migrations
                     b.HasKey("Id")
                         .HasAnnotation("SqlServer:Clustered", false);
 
-                    b.HasIndex("IdInt")
+                    b.HasIndex("Index")
                         .IsUnique();
 
                     b.HasIndex("NormalizedEmail")
@@ -111,17 +111,17 @@ namespace Community.Data.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("Community.Models.ApplicationUserFollowing", b =>
+            modelBuilder.Entity("Community.Models.ApplicationUserFollower", b =>
                 {
-                    b.Property<int>("FollowedUserIdInt");
+                    b.Property<int>("UserIndex");
 
-                    b.Property<int>("FollowerIdInt");
+                    b.Property<int>("FollowerIndex");
 
-                    b.HasKey("FollowedUserIdInt", "FollowerIdInt");
+                    b.HasKey("UserIndex", "FollowerIndex");
 
-                    b.HasIndex("FollowerIdInt");
+                    b.HasIndex("FollowerIndex");
 
-                    b.ToTable("UserFollowings");
+                    b.ToTable("UserFollowers");
                 });
 
             modelBuilder.Entity("Community.Models.Event", b =>
@@ -129,15 +129,15 @@ namespace Community.Data.Migrations
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("AddressIdInt");
+                    b.Property<int>("AddressIndex");
 
-                    b.Property<int>("CreatorIdInt");
+                    b.Property<int>("CreatorIndex");
 
                     b.Property<string>("Date");
 
                     b.Property<string>("Details");
 
-                    b.Property<int>("IdInt")
+                    b.Property<int>("Index")
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("Name");
@@ -147,54 +147,54 @@ namespace Community.Data.Migrations
                     b.HasKey("Id")
                         .HasAnnotation("SqlServer:Clustered", false);
 
-                    b.HasAlternateKey("IdInt");
+                    b.HasAlternateKey("Index");
 
-                    b.HasIndex("AddressIdInt");
+                    b.HasIndex("AddressIndex");
 
-                    b.HasIndex("CreatorIdInt");
+                    b.HasIndex("CreatorIndex");
 
-                    b.HasIndex("IdInt")
+                    b.HasIndex("Index")
                         .IsUnique();
 
                     b.ToTable("Events");
                 });
 
-            modelBuilder.Entity("Community.Models.EventAttending", b =>
+            modelBuilder.Entity("Community.Models.EventAttender", b =>
                 {
-                    b.Property<int>("AttendedEventIdInt");
+                    b.Property<int>("EventIndex");
 
-                    b.Property<int>("AttenderIdInt");
-
-                    b.Property<string>("AttendedEventId");
+                    b.Property<int>("AttenderIndex");
 
                     b.Property<string>("AttenderId");
 
-                    b.HasKey("AttendedEventIdInt", "AttenderIdInt");
+                    b.Property<string>("EventId");
 
-                    b.HasIndex("AttendedEventId");
+                    b.HasKey("EventIndex", "AttenderIndex");
 
                     b.HasIndex("AttenderId");
 
-                    b.ToTable("EventAttendings");
+                    b.HasIndex("EventId");
+
+                    b.ToTable("EventAttenders");
                 });
 
-            modelBuilder.Entity("Community.Models.EventFollowing", b =>
+            modelBuilder.Entity("Community.Models.EventFollower", b =>
                 {
-                    b.Property<int>("FollowedEventIdInt");
+                    b.Property<int>("EventIndex");
 
-                    b.Property<int>("FollowerIdInt");
+                    b.Property<int>("FollowerIndex");
 
-                    b.Property<string>("FollowedEventId");
+                    b.Property<string>("EventId");
 
                     b.Property<string>("FollowerId");
 
-                    b.HasKey("FollowedEventIdInt", "FollowerIdInt");
+                    b.HasKey("EventIndex", "FollowerIndex");
 
-                    b.HasIndex("FollowedEventId");
+                    b.HasIndex("EventId");
 
                     b.HasIndex("FollowerId");
 
-                    b.ToTable("EventFollowings");
+                    b.ToTable("EventFollowers");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRole", b =>
@@ -308,52 +308,52 @@ namespace Community.Data.Migrations
                 {
                     b.HasOne("Community.Models.ApplicationUser", "Creator")
                         .WithMany("Addresses")
-                        .HasForeignKey("CreatorIdInt")
-                        .HasPrincipalKey("IdInt");
+                        .HasForeignKey("CreatorIndex")
+                        .HasPrincipalKey("Index");
                 });
 
-            modelBuilder.Entity("Community.Models.ApplicationUserFollowing", b =>
+            modelBuilder.Entity("Community.Models.ApplicationUserFollower", b =>
                 {
+                    b.HasOne("Community.Models.ApplicationUser", "User")
+                        .WithMany("Followers")
+                        .HasForeignKey("FollowerIndex")
+                        .HasPrincipalKey("Index");
+
                     b.HasOne("Community.Models.ApplicationUser", "Follower")
                         .WithMany("FollowedUsers")
-                        .HasForeignKey("FollowedUserIdInt")
-                        .HasPrincipalKey("IdInt");
-
-                    b.HasOne("Community.Models.ApplicationUser", "FollowedUser")
-                        .WithMany("Followers")
-                        .HasForeignKey("FollowerIdInt")
-                        .HasPrincipalKey("IdInt");
+                        .HasForeignKey("UserIndex")
+                        .HasPrincipalKey("Index");
                 });
 
             modelBuilder.Entity("Community.Models.Event", b =>
                 {
                     b.HasOne("Community.Models.Address", "Address")
                         .WithMany("Events")
-                        .HasForeignKey("AddressIdInt")
-                        .HasPrincipalKey("IdInt");
+                        .HasForeignKey("AddressIndex")
+                        .HasPrincipalKey("Index");
 
                     b.HasOne("Community.Models.ApplicationUser", "Creator")
                         .WithMany("Events")
-                        .HasForeignKey("CreatorIdInt")
-                        .HasPrincipalKey("IdInt");
+                        .HasForeignKey("CreatorIndex")
+                        .HasPrincipalKey("Index");
                 });
 
-            modelBuilder.Entity("Community.Models.EventAttending", b =>
+            modelBuilder.Entity("Community.Models.EventAttender", b =>
                 {
-                    b.HasOne("Community.Models.Event", "AttendedEvent")
-                        .WithMany("Attenders")
-                        .HasForeignKey("AttendedEventId");
-
                     b.HasOne("Community.Models.ApplicationUser", "Attender")
                         .WithMany("AttendedEvents")
                         .HasForeignKey("AttenderId");
+
+                    b.HasOne("Community.Models.Event", "Event")
+                        .WithMany("Attenders")
+                        .HasForeignKey("EventId");
                 });
 
-            modelBuilder.Entity("Community.Models.EventFollowing", b =>
+            modelBuilder.Entity("Community.Models.EventFollower", b =>
                 {
-                    b.HasOne("Community.Models.Event", "FollowedEvent")
+                    b.HasOne("Community.Models.Event", "Event")
                         .WithMany("Followers")
-                        .HasForeignKey("FollowedEventId");
+                        .HasForeignKey("EventId");
 
                     b.HasOne("Community.Models.ApplicationUser", "Follower")
                         .WithMany("FollowedEvents")
