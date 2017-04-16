@@ -1,213 +1,102 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Community.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace Community.Data.Seed
 {
     public class Seed
     {
         private readonly ApplicationDbContext _context;
-        private readonly IConfigurationRoot _configuration;
-        private readonly PasswordHasher<ApplicationUser> _passwordHasher;
-        private ApplicationUser _admin, _jim, _marlene, _tim;
-        private Address _yardBar, _bullCreekDistrictPark, _alamoDrafthouseCinema;
-        private Event _drinks, _softball, _movies;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly string _adminEmail, _adminPassword;
+        private readonly Data _data;
 
-        public Seed(ApplicationDbContext context, IConfigurationRoot configuration)
+        public Seed(ApplicationDbContext context, string adminEmail, string adminPassword,
+            UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _context = context;
-            _configuration = configuration;
-            _passwordHasher = new PasswordHasher<ApplicationUser>();
+            _userManager = userManager;
+            _roleManager = roleManager;
+            _adminPassword = adminPassword;
+            _adminEmail = adminEmail;
+            _data = new Data();
         }
 
         public async Task SeedData()
         {
-            _context.Database.EnsureCreated();
-
-            if (!_context.Roles.Any()) await SeedRoles();
-            if (!_context.Users.Any()) await SeedUsers();
-            if (!_context.Addresses.Any()) await SeedAddresses();
-            if (!_context.Events.Any()) await SeedEvents();
+            if (!_roleManager.Roles.Any()) await CreateRoles();
+            if (!_userManager.Users.Any()) await CreateUsers();
+            if (!_context.Addresses.Any()) await CreateAddresses();
+            if (!_context.Events.Any()) await CreateEvents();
         }
 
-        private async Task SeedRoles()
+        private async Task CreateRoles()
         {
-            var roles = Roles.Names.Select(name => new IdentityRole
-                {
-                    Name = name,
-                    NormalizedName = name.ToUpper()
-                })
-                .ToList();
-
-            await _context.Roles.AddRangeAsync(roles);
-            await _context.SaveChangesAsync();
-            await SeedRoleClaims();
-        }
-
-        private async Task SeedRoleClaims()
-        {
-            var roleClaims = new List<IdentityRoleClaim<string>>();
-
-            roleClaims.AddRange(RoleClaims.ValuesAdmin.Select(value =>
-                new IdentityRoleClaim<string>
-                {
-                    ClaimType = "Admin",
-                    ClaimValue = value,
-                    RoleId = _context.Roles.Single(r => r.Name == "Admin").Id
-                }));
-            roleClaims.AddRange(RoleClaims.ValuesUser.Select(value =>
-                new IdentityRoleClaim<string>
-                {
-                    ClaimType = "User",
-                    ClaimValue = value,
-                    RoleId = _context.Roles.Single(r => r.Name == "User").Id
-                }));
-
-            await _context.RoleClaims.AddRangeAsync(roleClaims);
-            await _context.SaveChangesAsync();
-        }
-
-        private async Task SeedUsers()
-        {
-            await SeedAdmin();
-
-            foreach (var name in Users.Names)
+            using (_roleManager)
             {
-                var user = new ApplicationUser
+                foreach (var role in Data.Roles)
                 {
-                    Email = name,
-                    NormalizedEmail = name.ToUpper(),
-                    UserName = name,
-                    EmailConfirmed = false,
-                    NormalizedUserName = name.ToUpper(),
-                    PhoneNumber = string.Empty,
-                    PhoneNumberConfirmed = false
-                };
-
-                await _context.Users.AddAsync(user);
-                await _context.SaveChangesAsync();
-
-                user.PasswordHash = _passwordHasher.HashPassword(user, "password");
-
-                await SeedUserRoles(user);
+                    await _roleManager.CreateAsync(role);
+                    foreach (var claim in Data.Claims.Where(claim => claim.Type == role.Name))
+                        await _roleManager.AddClaimAsync(role, claim);
+                }
             }
-
-            _jim = _context.Users.Single(u => u.Email == "jim@gmail.com");
-            _marlene = _context.Users.Single(u => u.Email == "marlene@gmail.com");
-            _tim = _context.Users.Single(u => u.Email == "tim@gmail.com");
-
-            await SeedUserFollowers();
         }
 
-        private async Task SeedAdmin()
+        private async Task CreateUsers()
         {
-            var email = _configuration["AdminEmail"];
-            var password = _configuration["AdminPassword"];
-            _admin = new ApplicationUser
+            var admin = new ApplicationUser {UserName = _adminEmail, Email = _adminEmail};
+            var allRoles = Data.Roles.Select(role => role.Name);
+            var userClaims = Data.Claims.Where(claim => claim.Type.Equals("User")).ToList();
+
+            using (_userManager)
             {
-                Email = email,
-                NormalizedEmail = email.ToUpper(),
-                EmailConfirmed = true,
-                UserName = email,
-                NormalizedUserName = email.ToUpper(),
-                PhoneNumber = "+12345678901",
-                PhoneNumberConfirmed = true
-            };
+                await _userManager.CreateAsync(admin, _adminPassword);
+                await _userManager.AddToRolesAsync(admin, allRoles);
+                await _userManager.AddClaimsAsync(admin, Data.Claims);
 
-            await _context.Users.AddAsync(_admin);
-            await _context.SaveChangesAsync();
+                foreach (var user in Data.Users)
+                {
+                    await _userManager.CreateAsync(user, "@Password1");
+                    await _userManager.AddToRoleAsync(user, "User");
+                    await _userManager.AddClaimsAsync(user, userClaims);
+                }
 
-            _admin.PasswordHash = _passwordHasher.HashPassword(_admin, password);
-
-            await SeedUserRoles(_admin);
+                _data.Jim = _userManager.FindByEmailAsync("jim@gmail.com").Result;
+                _data.Marlene = _userManager.FindByEmailAsync("marlene@gmail.com").Result;
+                _data.Tim = _userManager.FindByEmailAsync("tim@gmail.com").Result;
+            }
+            await CreateUserFollowers();
         }
 
-        private async Task SeedUserRoles(ApplicationUser user)
-        {
-            var userRoles = new List<IdentityUserRole<string>>();
-
-            foreach (var role in _context.Roles)
-                if (role.Name == "Admin")
-                {
-                    if (user.Index == _admin.Index)
-                        userRoles.Add(new IdentityUserRole<string>
-                        {
-                            RoleId = role.Id,
-                            UserId = user.Id
-                        });
-                }
-                else
-                {
-                    userRoles.Add(new IdentityUserRole<string>
-                    {
-                        RoleId = role.Id,
-                        UserId = user.Id
-                    });
-                }
-
-            await _context.UserRoles.AddRangeAsync(userRoles);
-            await _context.SaveChangesAsync();
-            await SeedUserClaims(user);
-        }
-
-        private async Task SeedUserClaims(ApplicationUser user)
-        {
-            var userClaims = new List<IdentityUserClaim<string>>();
-
-            foreach (var claim in _context.RoleClaims)
-                if (claim.ClaimType == "Admin")
-                {
-                    if (user.Index == _admin.Index)
-                        userClaims.Add(new IdentityUserClaim<string>
-                        {
-                            ClaimType = claim.ClaimType,
-                            ClaimValue = claim.ClaimValue,
-                            UserId = user.Id
-                        });
-                }
-                else
-                {
-                    userClaims.Add(new IdentityUserClaim<string>
-                    {
-                        ClaimType = claim.ClaimType,
-                        ClaimValue = claim.ClaimValue,
-                        UserId = user.Id
-                    });
-                }
-
-            await _context.UserClaims.AddRangeAsync(userClaims);
-            await _context.SaveChangesAsync();
-        }
-
-        private async Task SeedUserFollowers()
+        private async Task CreateUserFollowers()
         {
             var userFollowers = new List<ApplicationUserFollower>
             {
                 new ApplicationUserFollower
                 {
-                    UserIndex = _jim.Index,
-                    FollowerIndex = _tim.Index
+                    FollowedUserId = _data.Jim.Id,
+                    FollowerId = _data.Tim.Id
                 },
                 new ApplicationUserFollower
                 {
-                    UserIndex = _jim.Index,
-                    FollowerIndex = _marlene.Index
+                    FollowedUserId = _data.Jim.Id,
+                    FollowerId = _data.Marlene.Id
                 },
                 new ApplicationUserFollower
                 {
-                    UserIndex = _tim.Index,
-                    FollowerIndex = _marlene.Index
+                    FollowedUserId = _data.Tim.Id,
+                    FollowerId = _data.Marlene.Id
                 },
                 new ApplicationUserFollower
                 {
-                    UserIndex = _marlene.Index,
-                    FollowerIndex = _jim.Index
+                    FollowedUserId = _data.Marlene.Id,
+                    FollowerId = _data.Jim.Id
                 }
             };
 
@@ -215,142 +104,170 @@ namespace Community.Data.Seed
             await _context.SaveChangesAsync();
         }
 
-        private async Task SeedAddresses()
+        private async Task CreateAddresses()
         {
-            var addresses = new List<Address>();
-
-            addresses.AddRange(Addresses.JimAddresses.Select(address => new Address
+            var addresses = new List<Address>
+            {
+                new Address
                 {
-                    Street = address["Street"],
-                    Street2 = address["Street2"],
-                    City = address["City"],
-                    State = address["State"],
-                    ZipCode = address["ZipCode"],
-                    Latitude = address["Latitude"],
-                    Longitude = address["Longitude"],
-                    Home = bool.Parse(address["Home"]),
-                    CreatorIndex = _jim.Index
-                }));
-            addresses.AddRange(Addresses.MarleneAddresses.Select(address => new Address
-            {
-                Street = address["Street"],
-                Street2 = address["Street2"],
-                City = address["City"],
-                State = address["State"],
-                ZipCode = address["ZipCode"],
-                Latitude = address["Latitude"],
-                Longitude = address["Longitude"],
-                Home = bool.Parse(address["Home"]),
-                CreatorIndex = _marlene.Index
-            }));
-            addresses.AddRange(Addresses.TimAddresses.Select(address => new Address
-            {
-                Street = address["Street"],
-                Street2 = address["Street2"],
-                City = address["City"],
-                State = address["State"],
-                ZipCode = address["ZipCode"],
-                Latitude = address["Latitude"],
-                Longitude = address["Longitude"],
-                Home = bool.Parse(address["Home"]),
-                CreatorIndex = _tim.Index
-            }));
+                    UserId = _data.Jim.Id,
+                    Street = "4600 W Guadalupe St",
+                    Street2 = "806",
+                    City = "Austin",
+                    State = "TX",
+                    ZipCode = "78751",
+                    Latitude = "30.314223",
+                    Longitude = "-97.732929",
+                    Home = true
+                },
+                new Address
+                {
+                    UserId = _data.Jim.Id,
+                    Street = "6700 Burnet Rd",
+                    Street2 = string.Empty,
+                    City = "Austin",
+                    State = "TX",
+                    ZipCode = "78757",
+                    Latitude = "30.343087",
+                    Longitude = "-97.739128",
+                    Home = false
+                },
+                new Address
+                {
+                    UserId = _data.Marlene.Id,
+                    Street = "6804 N Capital of Texas Hwy",
+                    Street2 = "1123",
+                    City = "Austin",
+                    State = "TX",
+                    ZipCode = "78731",
+                    Latitude = "30.369964",
+                    Longitude = "-97.789853",
+                    Home = true
+                },
+                new Address
+                {
+                    UserId = _data.Marlene.Id,
+                    Street = "6701 Lakewood Dr",
+                    Street2 = string.Empty,
+                    City = "Austin",
+                    State = "TX",
+                    ZipCode = "78731",
+                    Latitude = "30.368693",
+                    Longitude = "-97.784469",
+                    Home = false
+                },
+                new Address
+                {
+                    UserId = _data.Tim.Id,
+                    Street = "2819 Foster Ln",
+                    Street2 = "601",
+                    City = "Austin",
+                    State = "TX",
+                    ZipCode = "78757",
+                    Latitude = "30.356405",
+                    Longitude = "-97.738210",
+                    Home = true
+                },
+                new Address
+                {
+                    UserId = _data.Tim.Id,
+                    Street = "2700 W Anderson Ln",
+                    Street2 = string.Empty,
+                    City = "Austin",
+                    State = "TX",
+                    ZipCode = "78757",
+                    Latitude = "30.360028",
+                    Longitude = "-97.734848",
+                    Home = false
+                }
+            };
 
             await _context.Addresses.AddRangeAsync(addresses);
             await _context.SaveChangesAsync();
 
-            _yardBar = _context.Addresses
-                .Single(a => a.Latitude == "30.343087" && a.Longitude == "-97.739128");
-            _bullCreekDistrictPark = _context.Addresses
-                .Single(a => a.Latitude == "30.368693" && a.Longitude == "-97.784469");
-            _alamoDrafthouseCinema = _context.Addresses
-                .Single(a => a.Latitude == "30.360028" && a.Longitude == "-97.734848");
+            _data.YardBar = _context.Addresses.Single(address =>
+                address.Latitude == "30.343087" &&
+                address.Longitude == "-97.739128");
+            _data.BullCreek = _context.Addresses.Single(address =>
+                address.Latitude == "30.368693" &&
+                address.Longitude == "-97.784469");
+            _data.AlamoDrafthouse = _context.Addresses.Single(address =>
+                address.Latitude == "30.360028" &&
+                address.Longitude == "-97.734848");
         }
 
-        private async Task SeedEvents()
+        private async Task CreateEvents()
         {
-            var dateTime = DateTime.Now;
-            var date = dateTime.Date.ToString(CultureInfo.InvariantCulture);
-            var time = dateTime.TimeOfDay.ToString();
-            var events = new List<Event>();
-
-            events.AddRange(Events.JimEvents.Select(@event => new Event
+            var events = new List<Event>
             {
-                Name = @event["Name"],
-                Details = @event["Details"],
-                Date = date,
-                Time = time,
-                CreatorIndex = _jim.Index,
-                AddressIndex = _yardBar.Index
-            }));
-            events.AddRange(Events.MarleneEvents.Select(@event => new Event
-            {
-                Name = @event["Name"],
-                Details = @event["Details"],
-                Date = date,
-                Time = time,
-                CreatorIndex = _marlene.Index,
-                AddressIndex = _bullCreekDistrictPark.Index
-            }));
-            events.AddRange(Events.TimEvents.Select(@event => new Event
-            {
-                Name = @event["Name"],
-                Details = @event["Details"],
-                Date = date,
-                Time = time,
-                CreatorIndex = _tim.Index,
-                AddressIndex = _alamoDrafthouseCinema.Index
-            }));
+                new Event
+                {
+                    UserId = _data.Jim.Id,
+                    Name = "Drinks",
+                    Details = "Let's have some drinks at the Yard Bar.",
+                    Date = DateTime.Now,
+                    AddressId = _data.YardBar.Id
+                },
+                new Event
+                {
+                    UserId = _data.Marlene.Id,
+                    Name = "Softball",
+                    Details = "Join in for a game of softball at Bull Creek!",
+                    Date = DateTime.Now,
+                    AddressId = _data.BullCreek.Id
+                },
+                new Event
+                {
+                    UserId = _data.Tim.Id,
+                    Name = "Movies",
+                    Details = "We're going to watch some movies at the Alamo Drafthouse.",
+                    Date = DateTime.Now,
+                    AddressId = _data.AlamoDrafthouse.Id
+                }
+            };
 
             await _context.Events.AddRangeAsync(events);
             await _context.SaveChangesAsync();
 
-            _drinks = _context.Events.Single(e => e.Name == "Drinks");
-            _softball = _context.Events.Single(e => e.Name == "Softball");
-            _movies = _context.Events.Single(e => e.Name == "Movies");
+            _data.Drinks = _context.Events.Single(@event =>
+                @event.Name == "Drinks");
+            _data.Softball = _context.Events.Single(@event =>
+                @event.Name == "Softball");
+            _data.Movies = _context.Events.Single(@event =>
+                @event.Name == "Movies");
 
-            await SeedEventAttenders();
-            await SeedEventFollowers();
+            await CreateEventAttenders();
+            await CreateEventFollowers();
         }
 
-        private async Task SeedEventAttenders()
+        private async Task CreateEventAttenders()
         {
             var eventAttenders = new List<EventAttender>
             {
                 new EventAttender
                 {
-                    AttenderId = _jim.Id,
-                    AttenderIndex = _jim.Index,
-                    EventId = _drinks.Id,
-                    EventIndex = _drinks.Index
+                    AttenderId = _data.Jim.Id,
+                    AttendedEventId = _data.Drinks.Id
                 },
                 new EventAttender
                 {
-                    AttenderId = _marlene.Id,
-                    AttenderIndex = _marlene.Index,
-                    EventId = _softball.Id,
-                    EventIndex = _softball.Index
+                    AttenderId = _data.Marlene.Id,
+                    AttendedEventId = _data.Softball.Id
                 },
                 new EventAttender
                 {
-                    AttenderId = _tim.Id,
-                    AttenderIndex = _tim.Index,
-                    EventId = _softball.Id,
-                    EventIndex = _softball.Index
+                    AttenderId = _data.Tim.Id,
+                    AttendedEventId = _data.Softball.Id
                 },
                 new EventAttender
                 {
-                    AttenderId = _tim.Id,
-                    AttenderIndex = _tim.Index,
-                    EventId = _movies.Id,
-                    EventIndex = _movies.Index
+                    AttenderId = _data.Tim.Id,
+                    AttendedEventId = _data.Movies.Id
                 },
                 new EventAttender
                 {
-                    AttenderId = _jim.Id,
-                    AttenderIndex = _jim.Index,
-                    EventId = _movies.Id,
-                    EventIndex = _movies.Index
+                    AttenderId = _data.Jim.Id,
+                    AttendedEventId = _data.Movies.Id
                 }
             };
 
@@ -358,37 +275,29 @@ namespace Community.Data.Seed
             await _context.SaveChangesAsync();
         }
 
-        private async Task SeedEventFollowers()
+        private async Task CreateEventFollowers()
         {
             var eventFollowers = new List<EventFollower>
             {
                 new EventFollower
                 {
-                    EventId = _drinks.Id,
-                    EventIndex = _drinks.Index,
-                    FollowerId = _tim.Id,
-                    FollowerIndex = _tim.Index
+                    FollowedEventId = _data.Drinks.Id,
+                    FollowerId = _data.Tim.Id
                 },
                 new EventFollower
                 {
-                    EventId = _drinks.Id,
-                    EventIndex = _drinks.Index,
-                    FollowerId = _marlene.Id,
-                    FollowerIndex = _marlene.Index
+                    FollowedEventId = _data.Drinks.Id,
+                    FollowerId = _data.Marlene.Id
                 },
                 new EventFollower
                 {
-                    EventId = _movies.Id,
-                    EventIndex = _movies.Index,
-                    FollowerId = _marlene.Id,
-                    FollowerIndex = _marlene.Index
+                    FollowedEventId = _data.Movies.Id,
+                    FollowerId = _data.Marlene.Id
                 },
                 new EventFollower
                 {
-                    EventId = _softball.Id,
-                    EventIndex = _softball.Index,
-                    FollowerId = _jim.Id,
-                    FollowerIndex = _jim.Index
+                    FollowedEventId = _data.Softball.Id,
+                    FollowerId = _data.Jim.Id
                 }
             };
 

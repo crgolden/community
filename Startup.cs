@@ -5,6 +5,7 @@ using Community.Models;
 using Community.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -46,9 +47,9 @@ namespace Community
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("User", policy =>
-                    policy.RequireClaim("Permission", RoleClaims.ValuesUser));
+                    policy.RequireClaim("User"));
                 options.AddPolicy("Admin", policy =>
-                    policy.RequireClaim("Permission", RoleClaims.ValuesAdmin));
+                    policy.RequireClaim("Admin"));
             });
             services.AddMvc();
             services.AddTransient<IEmailSender, AuthMessageSender>()
@@ -72,7 +73,11 @@ namespace Community
                 .UseIdentity()
                 .UseMvcWithDefaultRoute();
 
-            new Seed(context, Configuration).SeedData().Wait();
+            context.Database.Migrate();
+            new Seed(context, Configuration["AdminEmail"], Configuration["AdminPassword"],
+                    app.ApplicationServices.GetService<UserManager<ApplicationUser>>(),
+                    app.ApplicationServices.GetService<RoleManager<IdentityRole>>())
+                .SeedData().Wait();
         }
     }
 }

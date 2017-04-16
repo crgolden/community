@@ -21,100 +21,48 @@ namespace Community.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            SetupAddress(builder);
-            SetupApplicationUser(builder);
-            SetupApplicationUserFollower(builder);
-            SetupEvent(builder);
-            SetupEventAttender(builder);
-            SetupEventFollower(builder);
-        }
-
-        private static void SetupAddress(ModelBuilder builder)
-        {
-            var address = builder.Entity<Address>();
-            address
-                .Property(p => p.Index)
-                .ValueGeneratedOnAdd();
-            address
-                .HasIndex(p => p.Index)
-                .IsUnique();
-            address
-                .HasOne(p => p.Creator)
-                .WithMany(p => p.Addresses)
-                .HasForeignKey(p => p.CreatorIndex)
-                .HasPrincipalKey(p => p.Index)
-                .OnDelete(DeleteBehavior.Restrict);
-        }
-
-        private static void SetupApplicationUser(ModelBuilder builder)
-        {
-            var applicationUser = builder.Entity<ApplicationUser>();
-            applicationUser
-                .Property(p => p.Index)
-                .ValueGeneratedOnAdd();
-            applicationUser
-                .HasIndex(p => p.Index)
-                .IsUnique();
-            applicationUser
-                .HasMany(p => p.AttendedEvents);
-            applicationUser
-                .HasMany(p => p.FollowedEvents);
-        }
-
-        private static void SetupApplicationUserFollower(ModelBuilder builder)
-        {
-            var applicationUserFollower = builder.Entity<ApplicationUserFollower>();
-            applicationUserFollower
-                .HasKey(p => new {p.UserIndex, p.FollowerIndex});
-            applicationUserFollower
-                .HasOne(p => p.User)
+            builder.Entity<ApplicationUser>()
+                .HasMany(p => p.Followers);
+            builder.Entity<Event>()
+                .HasMany(p => p.Attenders);
+            builder.Entity<Event>()
+                .HasMany(p => p.Followers);
+            builder.Entity<ApplicationUserFollower>()
+                .HasKey(p => new {p.FollowedUserId, p.FollowerId});
+            builder.Entity<ApplicationUserFollower>()
+                .HasOne(p => p.FollowedUser)
                 .WithMany(p => p.Followers)
-                .HasForeignKey(p => p.FollowerIndex)
-                .HasPrincipalKey(p => p.Index)
+                .HasForeignKey(p => p.FollowedUserId)
                 .OnDelete(DeleteBehavior.Restrict);
-            applicationUserFollower
+            builder.Entity<ApplicationUserFollower>()
                 .HasOne(p => p.Follower)
                 .WithMany(p => p.FollowedUsers)
-                .HasForeignKey(p => p.UserIndex)
-                .HasPrincipalKey(p => p.Index)
+                .HasForeignKey(p => p.FollowerId)
                 .OnDelete(DeleteBehavior.Restrict);
-        }
-
-        private static void SetupEvent(ModelBuilder builder)
-        {
-            var @event = builder.Entity<Event>();
-            @event
-                .Property(p => p.Index)
-                .ValueGeneratedOnAdd();
-            @event
-                .HasIndex(p => p.Index)
-                .IsUnique();
-            @event
-                .HasOne(p => p.Creator)
-                .WithMany(p => p.Events)
-                .HasForeignKey(p => p.CreatorIndex)
-                .HasPrincipalKey(p => p.Index)
+            builder.Entity<EventAttender>()
+                .HasKey(p => new {p.AttendedEventId, p.AttenderId});
+            builder.Entity<EventAttender>()
+                .HasOne(p => p.AttendedEvent)
+                .WithMany(p => p.Attenders)
+                .HasForeignKey(p => p.AttendedEventId)
                 .OnDelete(DeleteBehavior.Restrict);
-            @event
-                .HasOne(p => p.Address)
-                .WithMany(p => p.Events)
-                .HasForeignKey(p => p.AddressIndex)
-                .HasPrincipalKey(p => p.Index)
+            builder.Entity<EventAttender>()
+                .HasOne(p => p.Attender)
+                .WithMany(p => p.AttendedEvents)
+                .HasForeignKey(p => p.AttenderId)
                 .OnDelete(DeleteBehavior.Restrict);
-        }
-
-        private static void SetupEventAttender(ModelBuilder builder)
-        {
-            var eventAttender = builder.Entity<EventAttender>();
-            eventAttender
-                .HasKey(p => new {p.EventIndex, p.AttenderIndex});
-        }
-
-        private static void SetupEventFollower(ModelBuilder builder)
-        {
-            var eventFollower = builder.Entity<EventFollower>();
-            eventFollower
-                .HasKey(p => new {p.EventIndex, p.FollowerIndex});
+            builder.Entity<EventFollower>()
+                .HasKey(p => new {p.FollowedEventId, p.FollowerId});
+            builder.Entity<EventFollower>()
+                .HasOne(p => p.FollowedEvent)
+                .WithMany(p => p.Followers)
+                .HasForeignKey(p => p.FollowedEventId)
+                .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<EventFollower>()
+                .HasOne(p => p.Follower)
+                .WithMany(p => p.FollowedEvents)
+                .HasForeignKey(p => p.FollowerId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

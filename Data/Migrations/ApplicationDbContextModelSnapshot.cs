@@ -23,12 +23,7 @@ namespace Community.Data.Migrations
 
                     b.Property<string>("City");
 
-                    b.Property<int>("CreatorIndex");
-
                     b.Property<bool>("Home");
-
-                    b.Property<int>("Index")
-                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("Latitude");
 
@@ -40,14 +35,13 @@ namespace Community.Data.Migrations
 
                     b.Property<string>("Street2");
 
+                    b.Property<string>("UserId");
+
                     b.Property<string>("ZipCode");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatorIndex");
-
-                    b.HasIndex("Index")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("Addresses");
                 });
@@ -66,9 +60,6 @@ namespace Community.Data.Migrations
                         .HasMaxLength(256);
 
                     b.Property<bool>("EmailConfirmed");
-
-                    b.Property<int>("Index")
-                        .ValueGeneratedOnAdd();
 
                     b.Property<bool>("LockoutEnabled");
 
@@ -95,9 +86,6 @@ namespace Community.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Index")
-                        .IsUnique();
-
                     b.HasIndex("NormalizedEmail")
                         .HasName("EmailIndex");
 
@@ -110,13 +98,13 @@ namespace Community.Data.Migrations
 
             modelBuilder.Entity("Community.Models.ApplicationUserFollower", b =>
                 {
-                    b.Property<int>("UserIndex");
+                    b.Property<string>("FollowedUserId");
 
-                    b.Property<int>("FollowerIndex");
+                    b.Property<string>("FollowerId");
 
-                    b.HasKey("UserIndex", "FollowerIndex");
+                    b.HasKey("FollowedUserId", "FollowerId");
 
-                    b.HasIndex("FollowerIndex");
+                    b.HasIndex("FollowerId");
 
                     b.ToTable("UserFollowers");
                 });
@@ -126,65 +114,45 @@ namespace Community.Data.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("AddressIndex");
+                    b.Property<Guid>("AddressId");
 
-                    b.Property<int>("CreatorIndex");
-
-                    b.Property<string>("Date");
+                    b.Property<DateTime>("Date");
 
                     b.Property<string>("Details");
 
-                    b.Property<int>("Index")
-                        .ValueGeneratedOnAdd();
-
                     b.Property<string>("Name");
 
-                    b.Property<string>("Time");
+                    b.Property<string>("UserId");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AddressIndex");
+                    b.HasIndex("AddressId");
 
-                    b.HasIndex("CreatorIndex");
-
-                    b.HasIndex("Index")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("Events");
                 });
 
             modelBuilder.Entity("Community.Models.EventAttender", b =>
                 {
-                    b.Property<int>("EventIndex");
-
-                    b.Property<int>("AttenderIndex");
+                    b.Property<Guid>("AttendedEventId");
 
                     b.Property<string>("AttenderId");
 
-                    b.Property<Guid>("EventId");
-
-                    b.HasKey("EventIndex", "AttenderIndex");
+                    b.HasKey("AttendedEventId", "AttenderId");
 
                     b.HasIndex("AttenderId");
-
-                    b.HasIndex("EventId");
 
                     b.ToTable("EventAttenders");
                 });
 
             modelBuilder.Entity("Community.Models.EventFollower", b =>
                 {
-                    b.Property<int>("EventIndex");
-
-                    b.Property<int>("FollowerIndex");
-
-                    b.Property<Guid>("EventId");
+                    b.Property<Guid>("FollowedEventId");
 
                     b.Property<string>("FollowerId");
 
-                    b.HasKey("EventIndex", "FollowerIndex");
-
-                    b.HasIndex("EventId");
+                    b.HasKey("FollowedEventId", "FollowerId");
 
                     b.HasIndex("FollowerId");
 
@@ -300,56 +268,50 @@ namespace Community.Data.Migrations
 
             modelBuilder.Entity("Community.Models.Address", b =>
                 {
-                    b.HasOne("Community.Models.ApplicationUser", "Creator")
+                    b.HasOne("Community.Models.ApplicationUser", "User")
                         .WithMany("Addresses")
-                        .HasForeignKey("CreatorIndex")
-                        .HasPrincipalKey("Index");
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("Community.Models.ApplicationUserFollower", b =>
                 {
-                    b.HasOne("Community.Models.ApplicationUser", "User")
+                    b.HasOne("Community.Models.ApplicationUser", "FollowedUser")
                         .WithMany("Followers")
-                        .HasForeignKey("FollowerIndex")
-                        .HasPrincipalKey("Index");
+                        .HasForeignKey("FollowedUserId");
 
                     b.HasOne("Community.Models.ApplicationUser", "Follower")
                         .WithMany("FollowedUsers")
-                        .HasForeignKey("UserIndex")
-                        .HasPrincipalKey("Index");
+                        .HasForeignKey("FollowerId");
                 });
 
             modelBuilder.Entity("Community.Models.Event", b =>
                 {
                     b.HasOne("Community.Models.Address", "Address")
                         .WithMany("Events")
-                        .HasForeignKey("AddressIndex")
-                        .HasPrincipalKey("Index");
+                        .HasForeignKey("AddressId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Community.Models.ApplicationUser", "Creator")
+                    b.HasOne("Community.Models.ApplicationUser", "User")
                         .WithMany("Events")
-                        .HasForeignKey("CreatorIndex")
-                        .HasPrincipalKey("Index");
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("Community.Models.EventAttender", b =>
                 {
+                    b.HasOne("Community.Models.Event", "AttendedEvent")
+                        .WithMany("Attenders")
+                        .HasForeignKey("AttendedEventId");
+
                     b.HasOne("Community.Models.ApplicationUser", "Attender")
                         .WithMany("AttendedEvents")
                         .HasForeignKey("AttenderId");
-
-                    b.HasOne("Community.Models.Event", "Event")
-                        .WithMany("Attenders")
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Community.Models.EventFollower", b =>
                 {
-                    b.HasOne("Community.Models.Event", "Event")
+                    b.HasOne("Community.Models.Event", "FollowedEvent")
                         .WithMany("Followers")
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("FollowedEventId");
 
                     b.HasOne("Community.Models.ApplicationUser", "Follower")
                         .WithMany("FollowedEvents")

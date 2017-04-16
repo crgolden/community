@@ -5,7 +5,6 @@ namespace Community.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        public int Index { get; set; }
         public ICollection<Address> Addresses { get; set; }
         public ICollection<Event> Events { get; set; }
         public ICollection<EventAttender> AttendedEvents { get; set; }
