@@ -11,6 +11,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Community
 {
@@ -20,26 +24,34 @@ namespace Community
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", false, true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true)
-                .AddEnvironmentVariables();
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
 
             if (env.IsDevelopment())
+            {
+                // For more details on using the user secret store see https://go.microsoft.com/fwlink/?LinkID=532709
                 builder.AddUserSecrets<Startup>();
+            }
 
+            builder.AddEnvironmentVariables();
             Configuration = builder.Build();
         }
 
         public IConfigurationRoot Configuration { get; }
 
+        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Add framework services.
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 services.AddDbContext<ApplicationDbContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("WindowsConnection")));
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 services.AddDbContext<ApplicationDbContext>(options =>
                     options.UseSqlite(Configuration.GetConnectionString("OSXConnection")));
+
+            //services.AddDbContext<ApplicationDbContext>(options =>
+            //    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -52,28 +64,40 @@ namespace Community
                     policy.RequireClaim("Admin"));
             });
             services.AddMvc();
-            services.AddTransient<IEmailSender, AuthMessageSender>()
-                .AddTransient<ISmsSender, AuthMessageSender>();
+
+            // Add application services.
+            services.AddTransient<IEmailSender, AuthMessageSender>();
+            services.AddTransient<ISmsSender, AuthMessageSender>();
         }
 
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env,
             ILoggerFactory loggerFactory, ApplicationDbContext context)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"))
-                .AddDebug();
+            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+            loggerFactory.AddDebug();
 
             if (env.IsDevelopment())
-                app.UseDeveloperExceptionPage()
-                    .UseDatabaseErrorPage()
-                    .UseBrowserLink();
+            {
+                app.UseDeveloperExceptionPage();
+                app.UseDatabaseErrorPage();
+                app.UseBrowserLink();
+            }
             else
+            {
                 app.UseExceptionHandler("/Home/Error");
+            }
 
-            app.UseStaticFiles()
-                .UseIdentity()
-                .UseMvcWithDefaultRoute();
+            app.UseStaticFiles();
+
+            app.UseIdentity();
+
+            // Add external authentication middleware below. To configure them please see https://go.microsoft.com/fwlink/?LinkID=532715
+
+            app.UseMvcWithDefaultRoute();
 
             context.Database.Migrate();
+
             new Seed(context, Configuration["AdminEmail"], Configuration["AdminPassword"],
                     app.ApplicationServices.GetService<UserManager<ApplicationUser>>(),
                     app.ApplicationServices.GetService<RoleManager<IdentityRole>>())
