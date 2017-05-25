@@ -45,9 +45,27 @@ namespace Community.Data.Seed
 
         public static IEnumerable<ApplicationUser> Users => new List<ApplicationUser>
         {
-            new ApplicationUser {UserName = "jim@gmail.com", Email = "jim@gmail.com"},
-            new ApplicationUser {UserName = "marlene@gmail.com", Email = "marlene@gmail.com"},
-            new ApplicationUser {UserName = "tim@gmail.com", Email = "tim@gmail.com"}
+            new ApplicationUser
+            {
+                UserName = "jim@gmail.com",
+                Email = "jim@gmail.com",
+                FirstName = "Jim",
+                LastName = "Brown"
+            },
+            new ApplicationUser
+            {
+                UserName = "marlene@gmail.com",
+                Email = "marlene@gmail.com",
+                FirstName = "Marlene",
+                LastName = "Stephens"
+            },
+            new ApplicationUser
+            {
+                UserName = "tim@gmail.com",
+                Email = "tim@gmail.com",
+                FirstName = "Tim",
+                LastName = "Jones"
+            }
         };
     }
 }

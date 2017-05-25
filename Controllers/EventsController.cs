@@ -22,7 +22,9 @@ namespace Community.Controllers
         // GET: Events
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Events.Include(@event => @event.Address).Include(@event => @event.User);
+            var applicationDbContext = _context.Events
+                .Include(@event => @event.Address)
+                .Include(@event => @event.User);
             return View(await applicationDbContext.ToListAsync());
         }
 
