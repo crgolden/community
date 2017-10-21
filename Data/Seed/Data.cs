@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Security.Claims;
 using Community.Models;
-using Role = Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRole;
+using Role = Microsoft.AspNetCore.Identity.IdentityRole;
 
 namespace Community.Data.Seed
 {

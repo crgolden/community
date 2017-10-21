@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
+using Community.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Community.Controllers
@@ -29,7 +27,7 @@ namespace Community.Controllers
 
         public IActionResult Error()
         {
-            return View();
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

@@ -1,61 +1,53 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 using Community.Data;
 using Community.Data.Seed;
 using Community.Models;
-using Community.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using Community.Services;
+using Microsoft.AspNetCore.SpaServices.Webpack;
 
 namespace Community
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env)
+        public Startup(IConfiguration configuration)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
-
-            if (env.IsDevelopment())
-            {
-                // For more details on using the user secret store see https://go.microsoft.com/fwlink/?LinkID=532709
-                builder.AddUserSecrets<Startup>();
-            }
-
-            builder.AddEnvironmentVariables();
-            Configuration = builder.Build();
+            Configuration = configuration;
         }
 
-        public IConfigurationRoot Configuration { get; }
+        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
+            string connectionString;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                services.AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlServer(Configuration.GetConnectionString("WindowsConnection")));
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                services.AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlite(Configuration.GetConnectionString("OSXConnection")));
+            {
+                connectionString = Configuration.GetConnectionString("WindowsConnection");
 
-            //services.AddDbContext<ApplicationDbContext>(options =>
-            //    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+                services.AddDbContext<ApplicationDbContext>(x =>
+                    x.UseSqlServer(connectionString));
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                connectionString = Configuration.GetConnectionString("OSXConnection");
+
+                services.AddDbContext<ApplicationDbContext>(x =>
+                    x.UseSqlite(connectionString));
+            }
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
+
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("User", policy =>
@@ -63,25 +55,27 @@ namespace Community
                 options.AddPolicy("Admin", policy =>
                     policy.RequireClaim("Admin"));
             });
-            services.AddMvc();
 
             // Add application services.
-            services.AddTransient<IEmailSender, AuthMessageSender>();
-            services.AddTransient<ISmsSender, AuthMessageSender>();
+            services.AddTransient<IEmailSender, EmailSender>();
+
+            services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env,
-            ILoggerFactory loggerFactory, ApplicationDbContext context)
+           ILoggerFactory loggerFactory, ApplicationDbContext context,
+           UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
                 app.UseBrowserLink();
+                app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
+                {
+                    HotModuleReplacement = true
+                });
             }
             else
             {
@@ -90,18 +84,25 @@ namespace Community
 
             app.UseStaticFiles();
 
-            app.UseIdentity();
+            app.UseAuthentication();
 
-            // Add external authentication middleware below. To configure them please see https://go.microsoft.com/fwlink/?LinkID=532715
+            app.UseMvc(x =>
+            {
+                x.MapRoute(
+                    name: "default",
+                    template: "{controller=Home}/{action=Index}/{id?}");
 
-            app.UseMvcWithDefaultRoute();
+                x.MapSpaFallbackRoute(
+                    name: "spa-fallback",
+                    defaults: new { controller = "Home", action = "Index" });
+            });
 
             context.Database.Migrate();
 
-            new Seed(context, Configuration["AdminEmail"], Configuration["AdminPassword"],
-                    app.ApplicationServices.GetService<UserManager<ApplicationUser>>(),
-                    app.ApplicationServices.GetService<RoleManager<IdentityRole>>())
-                .SeedData().Wait();
+            var seed = new Seed(context, Configuration["AdminEmail"], Configuration["AdminPassword"],
+                    userManager, roleManager);
+
+            Task.Run(seed.SeedData).Wait();
         }
     }
 }

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Community.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Community.Data.Seed
 {
@@ -50,7 +49,14 @@ namespace Community.Data.Seed
 
         private async Task CreateUsers()
         {
-            var admin = new ApplicationUser {UserName = _adminEmail, Email = _adminEmail};
+            var admin = new ApplicationUser
+            {
+                UserName = _adminEmail,
+                FirstName = "Jack",
+                LastName = "Smith",
+                Email = _adminEmail,
+                SecurityStamp = $"{Guid.NewGuid()}"
+            };
             var allRoles = Data.Roles.Select(role => role.Name);
             var userClaims = Data.Claims.Where(claim => claim.Type.Equals("User")).ToList();
 

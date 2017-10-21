@@ -1,12 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Community.Data;
+using Community.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Community.Data;
-using Community.Models;
 
 namespace Community.Controllers
 {
@@ -16,7 +15,7 @@ namespace Community.Controllers
 
         public EventsController(ApplicationDbContext context)
         {
-            _context = context;    
+            _context = context;
         }
 
         // GET: Events
@@ -32,18 +31,14 @@ namespace Community.Controllers
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var @event = await _context.Events
                 .Include(x => x.Address)
                 .Include(x => x.User)
                 .SingleOrDefaultAsync(m => m.Id == id);
             if (@event == null)
-            {
                 return NotFound();
-            }
 
             return View(@event);
         }
@@ -79,15 +74,11 @@ namespace Community.Controllers
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var @event = await _context.Events.SingleOrDefaultAsync(m => m.Id == id);
             if (@event == null)
-            {
                 return NotFound();
-            }
             ViewData["AddressId"] = new SelectList(_context.Addresses, "Id", "Id", @event.AddressId);
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", @event.UserId);
             return View(@event);
@@ -101,9 +92,7 @@ namespace Community.Controllers
         public async Task<IActionResult> Edit(Guid id, [Bind("Id,Name,Details,Date,UserId,AddressId")] Event @event)
         {
             if (id != @event.Id)
-            {
                 return NotFound();
-            }
 
             if (ModelState.IsValid)
             {
@@ -115,13 +104,8 @@ namespace Community.Controllers
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!EventExists(@event.Id))
-                    {
                         return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    throw;
                 }
                 return RedirectToAction("Index");
             }
@@ -134,24 +118,21 @@ namespace Community.Controllers
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var @event = await _context.Events
                 .Include(x => x.Address)
                 .Include(x => x.User)
                 .SingleOrDefaultAsync(m => m.Id == id);
             if (@event == null)
-            {
                 return NotFound();
-            }
 
             return View(@event);
         }
 
         // POST: Events/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
+        [ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
