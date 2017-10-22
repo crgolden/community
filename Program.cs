@@ -9,7 +9,6 @@ namespace Community
         public static void Main(string[] args)
         {
             BuildWebHost(args)
-                .MigrateDatabase()
                 .Run();
         }
 
