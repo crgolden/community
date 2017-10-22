@@ -96,13 +96,6 @@ namespace Community
                     name: "spa-fallback",
                     defaults: new { controller = "Home", action = "Index" });
             });
-
-            context.Database.Migrate();
-
-            var seed = new Seed(context, Configuration["AdminEmail"], Configuration["AdminPassword"],
-                    userManager, roleManager);
-
-            Task.Run(seed.SeedData).Wait();
         }
     }
 }
