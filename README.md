@@ -1,14 +1,14 @@
-﻿##Community
-###A site to create and share events
+﻿## Community
+### A site to create and share events
 
 I built this app to get experience with [ASP.NET Core](https://www.asp.net/core) and [Angular 2](https://angular.io/).
 
-####Features
+#### Features
 
 1. Users can view, create, edit, and delete Events
 2. Developers can contribute to the open source repository
 
-####Tools and Technologies
+#### Tools and Technologies
 
 1. [Bootstrap](http://getbootstrap.com/)
 3. [ASP.NET Identity](https://www.asp.net/identity) (User authentication)
