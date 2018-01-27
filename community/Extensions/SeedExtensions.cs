@@ -25,7 +25,7 @@ namespace community.Extensions
 
         public static async Task CreateUsersAsync(this Seed seed, string adminEmail, string adminPassword)
         {
-            var admin = new ApplicationUser
+            var admin = new User
             {
                 UserName = adminEmail,
                 FirstName = "Jack",
@@ -54,26 +54,26 @@ namespace community.Extensions
 
         public static async Task CreateUserFollowers(this Seed seed)
         {
-            var userFollowers = new List<ApplicationUserFollower>
+            var userFollowers = new List<UserFollower>
             {
-                new ApplicationUserFollower
+                new UserFollower
                 {
-                    FollowedUserId = seed.Jim.Id,
+                    UserId = seed.Jim.Id,
                     FollowerId = seed.Tim.Id
                 },
-                new ApplicationUserFollower
+                new UserFollower
                 {
-                    FollowedUserId = seed.Jim.Id,
+                    UserId = seed.Jim.Id,
                     FollowerId = seed.Marlene.Id
                 },
-                new ApplicationUserFollower
+                new UserFollower
                 {
-                    FollowedUserId = seed.Tim.Id,
+                    UserId = seed.Tim.Id,
                     FollowerId = seed.Marlene.Id
                 },
-                new ApplicationUserFollower
+                new UserFollower
                 {
-                    FollowedUserId = seed.Marlene.Id,
+                    UserId = seed.Marlene.Id,
                     FollowerId = seed.Jim.Id
                 }
             };

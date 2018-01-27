@@ -12,11 +12,11 @@ namespace community.Data
     public class Seed
     {
         public readonly ApplicationDbContext Context;
-        public readonly UserManager<ApplicationUser> UserManager;
+        public readonly UserManager<User> UserManager;
         public readonly RoleManager<Role> RoleManager;
-        public ApplicationUser Jim { get; set; }
-        public ApplicationUser Marlene { get; set; }
-        public ApplicationUser Tim { get; set; }
+        public User Jim { get; set; }
+        public User Marlene { get; set; }
+        public User Tim { get; set; }
         public Address YardBar { get; set; }
         public Address BullCreek { get; set; }
         public Address AlamoDrafthouse { get; set; }
@@ -50,23 +50,23 @@ namespace community.Data
             new Role("Admin")
         };
 
-        public static IEnumerable<ApplicationUser> Users => new List<ApplicationUser>
+        public static IEnumerable<User> Users => new List<User>
         {
-            new ApplicationUser
+            new User
             {
                 UserName = "jim@gmail.com",
                 Email = "jim@gmail.com",
                 FirstName = "Jim",
                 LastName = "Brown"
             },
-            new ApplicationUser
+            new User
             {
                 UserName = "marlene@gmail.com",
                 Email = "marlene@gmail.com",
                 FirstName = "Marlene",
                 LastName = "Stephens"
             },
-            new ApplicationUser
+            new User
             {
                 UserName = "tim@gmail.com",
                 Email = "tim@gmail.com",
@@ -75,7 +75,7 @@ namespace community.Data
             }
         };
 
-        public Seed(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<Role> roleManager)
+        public Seed(ApplicationDbContext context, UserManager<User> userManager, RoleManager<Role> roleManager)
         {
             Context = context;
             UserManager = userManager;

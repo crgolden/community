@@ -47,7 +47,7 @@ namespace community
                     x.UseSqlite(connectionString));
             }
 
-            services.AddIdentity<ApplicationUser, IdentityRole>()
+            services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
@@ -98,7 +98,7 @@ namespace community
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env,
            ILoggerFactory loggerFactory, ApplicationDbContext context,
-           UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+           UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
         {
             if (env.IsDevelopment())
             {

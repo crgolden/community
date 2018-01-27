@@ -1,6 +1,6 @@
 ﻿@using community.Models
 @using Microsoft.AspNetCore.Identity
-@inject SignInManager<ApplicationUser> SignInManager
+@inject SignInManager<User> SignInManager
 @{
     var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
 }

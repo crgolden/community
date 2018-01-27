@@ -10,7 +10,7 @@ namespace community.Models
         public string Details { get; set; }
         public DateTime Date { get; set; }
         public string UserId { get; set; }
-        public ApplicationUser User { get; set; }
+        public User User { get; set; }
         public Guid AddressId { get; set; }
         public Address Address { get; set; }
         public ICollection<EventAttender> Attenders { get; set; }

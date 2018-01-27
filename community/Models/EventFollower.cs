@@ -7,6 +7,6 @@ namespace community.Models
         public Guid FollowedEventId { get; set; }
         public Event FollowedEvent { get; set; }
         public string FollowerId { get; set; }
-        public ApplicationUser Follower { get; set; }
+        public User Follower { get; set; }
     }
 }

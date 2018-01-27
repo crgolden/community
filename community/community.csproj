@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,6 +23,22 @@
   <ItemGroup>
     <!-- Files not to publish (note that the 'dist' subfolders are re-added below) -->
     <Content Remove="ClientApp\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="ClientApp\app\account\account.module.ts" />
+    <None Remove="ClientApp\app\account\account.service.ts" />
+    <None Remove="ClientApp\app\app.service.ts" />
+    <None Remove="ClientApp\app\models\user.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\app\account\account.module.ts" />
+    <TypeScriptCompile Include="ClientApp\app\account\account.service.ts" />
+    <TypeScriptCompile Include="ClientApp\app\account\login\login.ts" />
+    <TypeScriptCompile Include="ClientApp\app\account\register\register.ts" />
+    <TypeScriptCompile Include="ClientApp\app\app.service.ts" />
+    <TypeScriptCompile Include="ClientApp\app\models\user.ts" />
   </ItemGroup>
 
   <Target Name="DebugRunWebpack" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('wwwroot\dist') ">

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using community.Extensions;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace community.Controllers
@@ -17,21 +19,24 @@ namespace community.Controllers
     [Route("[controller]/[action]")]
     public class AccountController : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
+        private readonly IConfiguration _configuration;
 
         public AccountController(
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
+            UserManager<User> userManager,
+            SignInManager<User> signInManager,
             IEmailSender emailSender,
-            ILogger<AccountController> logger)
+            ILogger<AccountController> logger,
+            IConfiguration configuration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
             _logger = logger;
+            _configuration = configuration;
         }
 
         [TempData]
@@ -50,37 +55,36 @@ namespace community.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
+        //TODO [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login([FromBody] LoginViewModel model)
         {
-            ViewData["ReturnUrl"] = returnUrl;
-            if (ModelState.IsValid)
+            var user = new User {Email = model.Email};
+            if (!ModelState.IsValid)
             {
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
-                if (result.Succeeded)
-                {
-                    _logger.LogInformation("User logged in.");
-                    return RedirectToLocal(returnUrl);
-                }
-                if (result.RequiresTwoFactor)
-                {
-                    return RedirectToAction(nameof(LoginWith2fa), new { returnUrl, model.RememberMe });
-                }
-                if (result.IsLockedOut)
-                {
-                    _logger.LogWarning("User account locked out.");
-                    return RedirectToAction(nameof(Lockout));
-                }
-                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                return View(model);
+                Response.StatusCode = (int) HttpStatusCode.BadRequest;
+                return Json(null);
             }
-
-            // If we got this far, something failed, redisplay form
-            return View(model);
+            var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
+            if (result.Succeeded)
+            {
+                user = await _userManager.FindByEmailAsync(model.Email);
+                var generator = new TokenGenerator(_configuration, _userManager);
+                var token = await generator.GenerateToken(user);
+                _logger.LogInformation("User logged in.");
+                return Json(user.ToViewModel(token));
+            }
+            if (result.RequiresTwoFactor)
+            {
+                return RedirectToAction(nameof(LoginWith2fa), new {model.ReturnUrl, model.RememberMe});
+            }
+            if (result.IsLockedOut)
+            {
+                _logger.LogWarning("User account locked out.");
+                return RedirectToAction(nameof(Lockout));
+            }
+            Response.StatusCode = (int) HttpStatusCode.BadRequest;
+            return Json(user.ToViewModel());
         }
-
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> LoginWith2fa(bool rememberMe, string returnUrl = null)
@@ -101,7 +105,7 @@ namespace community.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
+        //TODO [ValidateAntiForgeryToken]
         public async Task<IActionResult> LoginWith2fa(LoginWith2faViewModel model, bool rememberMe, string returnUrl = null)
         {
             if (!ModelState.IsValid)
@@ -152,7 +156,7 @@ namespace community.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
+        //TODO [ValidateAntiForgeryToken]
         public async Task<IActionResult> LoginWithRecoveryCode(LoginWithRecoveryCodeViewModel model, string returnUrl = null)
         {
             if (!ModelState.IsValid)
@@ -202,35 +206,40 @@ namespace community.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
+        //TODO [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            ViewData["ReturnUrl"] = returnUrl;
-            if (ModelState.IsValid)
+            ViewData["ReturnUrl"] = model.ReturnUrl;
+            if (!ModelState.IsValid) return View(model);
+
+            var user = new User
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
-                var result = await _userManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
-                {
-                    _logger.LogInformation("User created a new account with password.");
+                UserName = model.Email,
+                Email = model.Email,
+                FirstName = model.FirstName,
+                LastName = model.LastName
+            };
+            var result = await _userManager.CreateAsync(user, model.Password);
+            if (result.Succeeded)
+            {
+                _logger.LogInformation("User created a new account with password.");
 
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
-                    await _emailSender.SendEmailConfirmationAsync(model.Email, callbackUrl);
+                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
+                await _emailSender.SendEmailConfirmationAsync(model.Email, callbackUrl);
 
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    _logger.LogInformation("User created a new account with password.");
-                    return RedirectToLocal(returnUrl);
-                }
-                AddErrors(result);
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                _logger.LogInformation("User created a new account with password.");
+                return RedirectToLocal(model.ReturnUrl);
             }
+            AddErrors(result);
 
             // If we got this far, something failed, redisplay form
             return View(model);
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //TODO [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
@@ -240,7 +249,7 @@ namespace community.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
+        //TODO [ValidateAntiForgeryToken]
         public IActionResult ExternalLogin(string provider, string returnUrl = null)
         {
             // Request a redirect to the external login provider.
@@ -284,7 +293,7 @@ namespace community.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
+        //TODO [ValidateAntiForgeryToken]
         public async Task<IActionResult> ExternalLoginConfirmation(ExternalLoginViewModel model, string returnUrl = null)
         {
             if (ModelState.IsValid)
@@ -295,7 +304,7 @@ namespace community.Controllers
                 {
                     throw new ApplicationException("Error loading external login information during confirmation.");
                 }
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new User { UserName = model.Email, Email = model.Email };
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
@@ -340,7 +349,7 @@ namespace community.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
+        //TODO [ValidateAntiForgeryToken]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
         {
             if (ModelState.IsValid)
@@ -386,7 +395,7 @@ namespace community.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
+        //TODO [ValidateAntiForgeryToken]
         public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
         {
             if (!ModelState.IsValid)

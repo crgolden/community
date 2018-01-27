@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace community.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : IdentityDbContext<User>
     {
         public ApplicationDbContext(DbContextOptions options)
             : base(options)
@@ -12,7 +12,7 @@ namespace community.Data
         }
 
         public DbSet<Address> Addresses { get; set; }
-        public DbSet<ApplicationUserFollower> UserFollowers { get; set; }
+        public DbSet<UserFollower> UserFollowers { get; set; }
         public DbSet<Event> Events { get; set; }
         public DbSet<EventAttender> EventAttenders { get; set; }
         public DbSet<EventFollower> EventFollowers { get; set; }
@@ -23,20 +23,20 @@ namespace community.Data
             // Customize the ASP.NET Identity model and override the defaults if needed.
             // For example, you can rename the ASP.NET Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);
-            builder.Entity<ApplicationUser>()
+            builder.Entity<User>()
                 .HasMany(p => p.Followers);
             builder.Entity<Event>()
                 .HasMany(p => p.Attenders);
             builder.Entity<Event>()
                 .HasMany(p => p.Followers);
-            builder.Entity<ApplicationUserFollower>()
-                .HasKey(p => new {p.FollowedUserId, p.FollowerId});
-            builder.Entity<ApplicationUserFollower>()
-                .HasOne(p => p.FollowedUser)
+            builder.Entity<UserFollower>()
+                .HasKey(p => new {p.UserId, p.FollowerId});
+            builder.Entity<UserFollower>()
+                .HasOne(p => p.User)
                 .WithMany(p => p.Followers)
-                .HasForeignKey(p => p.FollowedUserId)
+                .HasForeignKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
-            builder.Entity<ApplicationUserFollower>()
+            builder.Entity<UserFollower>()
                 .HasOne(p => p.Follower)
                 .WithMany(p => p.FollowedUsers)
                 .HasForeignKey(p => p.FollowerId)

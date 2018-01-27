@@ -2,6 +2,7 @@
 
 namespace community.Models.AccountViewModels
 {
+    // TypeScript: register.ts
     public class RegisterViewModel
     {
         [Required]
@@ -19,5 +20,10 @@ namespace community.Models.AccountViewModels
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
+
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Name => $"{FirstName} {LastName}";
+        public string ReturnUrl {get; set; }
     }
 }
