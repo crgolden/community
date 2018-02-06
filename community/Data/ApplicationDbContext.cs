@@ -66,5 +66,7 @@ namespace community.Data
                 .HasForeignKey(p => p.FollowerId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
+
+        public DbSet<community.Models.User> User { get; set; }
     }
 }

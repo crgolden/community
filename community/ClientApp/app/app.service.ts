@@ -12,12 +12,11 @@ export class AppService {
         }
 
         let modelStateErrors: string = "";
-        const serverError = error.json();
 
-        if (!serverError.type) {
-            for (let key in serverError) {
-                if (serverError.hasOwnProperty(key) && serverError[key])
-                    modelStateErrors += serverError[key] + "\n";
+        if (!error.type) {
+            for (let key in error) {
+                if (error.hasOwnProperty(key) && error[key])
+                    modelStateErrors += error[key] + "\n";
             }
         }
 

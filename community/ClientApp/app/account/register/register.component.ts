@@ -2,7 +2,7 @@ import { Component } from "@angular/core";
 import { Router } from "@angular/router";
 
 import { AccountService } from "../account.service"
-import { Register } from "./register"
+import { IRegister } from "./register.interface"
 
 @Component({
     selector: "app-registration-form",
@@ -17,7 +17,7 @@ export class RegisterComponent {
 
     constructor(private readonly accountService: AccountService, private readonly router: Router) {}
 
-    register({ value, valid }: { value: Register, valid: boolean }) {
+    register({ value, valid }: { value: IRegister, valid: boolean }) {
 
         var that = this;
         that.submitted = true;

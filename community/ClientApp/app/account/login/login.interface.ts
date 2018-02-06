@@ -1,5 +1,5 @@
 ﻿// C#: LoginViewModel
-export class Login {
+export interface ILogin {
     email: string;
     password: string;
     returnUrl: string;

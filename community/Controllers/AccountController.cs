@@ -42,16 +42,16 @@ namespace community.Controllers
         [TempData]
         public string ErrorMessage { get; set; }
 
-        [HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> Login(string returnUrl = null)
-        {
-            // Clear the existing external cookie to ensure a clean login process
-            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+        //[HttpGet]
+        //[AllowAnonymous]
+        //public async Task<IActionResult> Login(string returnUrl = null)
+        //{
+        //    // Clear the existing external cookie to ensure a clean login process
+        //    await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
-            ViewData["ReturnUrl"] = returnUrl;
-            return View();
-        }
+        //    ViewData["ReturnUrl"] = returnUrl;
+        //    return View();
+        //}
 
         [HttpPost]
         [AllowAnonymous]
@@ -71,7 +71,7 @@ namespace community.Controllers
                 var generator = new TokenGenerator(_configuration, _userManager);
                 var token = await generator.GenerateToken(user);
                 _logger.LogInformation("User logged in.");
-                return Json(user.ToViewModel(token));
+                return Json(new UserViewModel(user){ Token = token });
             }
             if (result.RequiresTwoFactor)
             {
@@ -83,8 +83,9 @@ namespace community.Controllers
                 return RedirectToAction(nameof(Lockout));
             }
             Response.StatusCode = (int) HttpStatusCode.BadRequest;
-            return Json(user.ToViewModel());
+            return Json(new UserViewModel(user));
         }
+
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> LoginWith2fa(bool rememberMe, string returnUrl = null)
@@ -196,13 +197,13 @@ namespace community.Controllers
             return View();
         }
 
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult Register(string returnUrl = null)
-        {
-            ViewData["ReturnUrl"] = returnUrl;
-            return View();
-        }
+        //[HttpGet]
+        //[AllowAnonymous]
+        //public IActionResult Register(string returnUrl = null)
+        //{
+        //    ViewData["ReturnUrl"] = returnUrl;
+        //    return View();
+        //}
 
         [HttpPost]
         [AllowAnonymous]

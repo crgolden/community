@@ -17,8 +17,5 @@ namespace community.Models
         public string UserId { get; set; }
         public User User { get; set; }
         public ICollection<Event> Events { get; set; }
-
-        public string FullAddress =>
-            $"{Street}{(string.IsNullOrEmpty(Street2) ? string.Empty : $" {Street2}")}, {City}, {State} {ZipCode}";
     }
 }

@@ -1,5 +1,5 @@
 ﻿// C#: RegisterViewModel
-export class Register {
+export interface IRegister {
     email: string;
     password: string;
     confirmPassword: string;

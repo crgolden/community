@@ -1,0 +1,10 @@
+<h2>Events</h2>
+
+<a routerLink="/events/create">Create New</a>
+<ul class="events">
+    <li *ngFor="let event of events">
+        <a routerLink="/events/details/{{event.id}}">
+            {{event.name}}, {{event.date | date}}
+        </a>
+    </li>
+</ul>

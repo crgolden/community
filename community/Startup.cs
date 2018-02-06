@@ -121,9 +121,9 @@ namespace community
 
             app.UseMvc(x =>
             {
-                x.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                //x.MapRoute(
+                //    name: "default",
+                //    template: "{controller=Home}/{action=Index}/{id?}");
 
                 x.MapSpaFallbackRoute(
                     name: "spa-fallback",

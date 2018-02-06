@@ -17,6 +17,31 @@
                         <span class='glyphicon glyphicon-home'></span> Home
                     </a>
                 </li>
+                <li [routerLinkActive]="['link-active']">
+                    <a [routerLink]="['/events']">
+                        <span class='glyphicon glyphicon-calendar'></span> Events
+                    </a>
+                </li>
+                <li [routerLinkActive]="['link-active']">
+                    <a [routerLink]="['/addresses']">
+                        <span class='glyphicon glyphicon-map-marker'></span> Addresses
+                    </a>
+                </li>
+                <li [routerLinkActive]="['link-active']">
+                    <a [routerLink]="['/users']">
+                        <span class='glyphicon glyphicon-user'></span> Users
+                    </a>
+                </li>
+                <li [routerLinkActive]="['link-active']">
+                    <a [routerLink]="['/account/register']">
+                        <span class='glyphicon glyphicon-edit'></span> Register
+                    </a>
+                </li>
+                <li [routerLinkActive]="['link-active']">
+                    <a [routerLink]="['/account/login']">
+                        <span class='glyphicon glyphicon-log-in'></span> Login
+                    </a>
+                </li>
             </ul>
         </div>
     </div>

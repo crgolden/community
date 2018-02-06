@@ -2,7 +2,7 @@ import { Component } from "@angular/core";
 import { Router } from "@angular/router";
 
 import { AccountService } from "../account.service"
-import { Login } from "../login/login"
+import { ILogin } from "./login.interface"
 
 @Component({
     selector: "app-login-form",
@@ -17,7 +17,7 @@ export class LoginComponent {
 
     constructor(private readonly accountService: AccountService, private readonly router: Router) { }
 
-    login({ value, valid }: { value: Login, valid: boolean }) {
+    login({ value, valid }: { value: ILogin, valid: boolean }) {
 
         var that = this;
         that.submitted = true;

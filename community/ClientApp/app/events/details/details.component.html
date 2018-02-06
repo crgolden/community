@@ -1,0 +1,24 @@
+<h2>Event Details</h2>
+
+<dl class="dl-horizontal">
+    <dt>
+        Name
+    </dt>
+    <dd>
+        {{event.name}}
+    </dd>
+    <dt>
+        Details
+    </dt>
+    <dd>
+        {{event.details}}
+    </dd>
+    <dt>
+        Date
+    </dt>
+    <dd>
+        {{event.date | date}}
+    </dd>
+</dl>
+
+<button (click)="goBack()">go back</button>

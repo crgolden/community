@@ -1,0 +1,10 @@
+<h2>Addresses</h2>
+
+<a routerLink="/addresses/create">Create New</a>
+<ul class="addresses">
+    <li *ngFor="let address of addresses">
+        <a routerLink="/addresses/details/{{address.id}}">
+            {{address.fullAddress}}
+        </a>
+    </li>
+</ul>

@@ -4,6 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
 import { AccountModule } from "./account/account.module"
+import { UsersModule } from "./users/users.module"
+import { EventsModule } from "./events/events.module"
+import { AddressesModule } from "./addresses/addresses.module"
 
 import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
@@ -26,7 +29,10 @@ import { AppService } from "./app.service"
             { path: 'home', component: HomeComponent },
             { path: '**', redirectTo: 'home' }
         ]),
-        AccountModule
+        AccountModule,
+        UsersModule,
+        EventsModule,
+        AddressesModule
     ],
     providers: [
         AppService

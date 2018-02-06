@@ -41,8 +41,8 @@ namespace community.Services
             claims.Add(new Claim(JwtRegisteredClaimNames.Jti, $"{Guid.NewGuid()}"));
             claims.Add(new Claim(JwtRegisteredClaimNames.Iat, $"{DateTime.Now}", ClaimValueTypes.Integer64));
 
-            var secretKeyByets = Encoding.UTF8.GetBytes(_secretKey);
-            var signingKey = new SymmetricSecurityKey(secretKeyByets);
+            var secretKeyBytes = Encoding.UTF8.GetBytes(_secretKey);
+            var signingKey = new SymmetricSecurityKey(secretKeyBytes);
             var signingCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
 
             var jwtToken = new JwtSecurityToken(_issuer, _audience, claims,

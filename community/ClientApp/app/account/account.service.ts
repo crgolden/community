@@ -1,12 +1,12 @@
 ﻿import { Injectable } from "@angular/core";
-import { Http, Headers, RequestOptions } from "@angular/http";
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from "rxjs/Rx";
 
 import { AppService } from "../app.service";
-import { User } from "../models/user"
+import { User } from "../users/user"
 
-import { Register } from "./register/register";
-import { Login } from "./login/login";
+import { IRegister } from "./register/register.interface";
+import { ILogin } from "./login/login.interface";
 
 @Injectable()
 export class AccountService extends AppService {
@@ -14,54 +14,41 @@ export class AccountService extends AppService {
     private loggedIn: boolean = false;
     private user: User;
 
-    constructor(private readonly http: Http) {
+    constructor(private readonly http: HttpClient) {
         super();
         this.user = new User();
     }
 
-    register(value: Register): Observable<boolean> {
+    register(value: IRegister): Observable<void> {
 
         var that = this;
-        const headers = new Headers({
-                  'Content-Type': "application/json",
-                  'Authorization': null
-              }),
-            body = JSON.stringify(value),
-            options = new RequestOptions({ headers: headers });
+        const body = JSON.stringify(value),
+            httpOptions = {
+                headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+            }
 
         return that.http
-            .post("/account/register", body, options)
+            .post<User>("/account/register", body, httpOptions)
             .map(res => {
-                if (res.status === 200) {
-                    that.setUser(res.json());
+                    that.setUser(res);
                     that.loggedIn = true;
-                    return true;
-                } else {
-                    return false;
-                }
             })
             .catch(that.handleError);
     }
 
-    login(value: Login): Observable<boolean> {
+    login(value: ILogin): Observable<boolean> {
 
         var that = this;
-        const headers = new Headers({
-                  'Content-Type': "application/json",
-                  'Authorization': null
-              }),
-            body = JSON.stringify(value);
-        
+        const body = JSON.stringify(value),
+            httpOptions = {
+                headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+            };
+
         return that.http
-            .post("/account/login", body, { headers })
+            .post<User>("/account/login", body, httpOptions)
             .map(res => {
-                if (res.status === 200) {
-                    that.setUser(res.json());
+                    that.setUser(res);
                     that.loggedIn = true;
-                    return true;
-                } else {
-                    return false;
-                }
             })
             .catch(that.handleError);
     }

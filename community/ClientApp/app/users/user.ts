@@ -1,4 +1,5 @@
-﻿export class User {
+﻿// C#: UserViewModel
+export class User {
     id: string;
     email: string;
     firstName: string;

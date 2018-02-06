@@ -12,9 +12,9 @@ import { LoginComponent } from "./login/login.component";
     imports: [
         CommonModule,
         FormsModule,
-        RouterModule.forRoot([
-            { path: 'register', component: RegisterComponent },
-            { path: 'login', component: LoginComponent }
+        RouterModule.forChild([
+            { path: 'account/register', component: RegisterComponent },
+            { path: 'account/login', component: LoginComponent }
         ])
     ],
     declarations: [
