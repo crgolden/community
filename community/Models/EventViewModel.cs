@@ -11,6 +11,11 @@ namespace community.Models
         public DateTime Date { get; set; }
         public string UserId { get; set; }
         public Guid AddressId { get; set; }
+        public string Street { get; set; }
+        public string Street2 { get; set; }
+        public string City { get; set; }
+        public string State { get; set; }
+        public string ZipCode { get; set; }
 
         public EventViewModel(Event @event)
         {
