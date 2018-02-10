@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace community.Controllers
 {
-    [Authorize]
     [Route("[controller]/[action]")]
     public class EventsController : Controller
     {
@@ -22,14 +21,12 @@ namespace community.Controllers
         }
 
         // GET: Events
-        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             return Json(await _context.Events.Select(x => new EventViewModel(x)).ToArrayAsync());
         }
 
         // GET: Events/Details/5
-        [AllowAnonymous]
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null)
@@ -45,6 +42,7 @@ namespace community.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "User")]
         //TODO [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([FromBody, Bind("Id,Name,Details,Date,UserId,AddressId,Street,Street2,City,State,ZipCode")] EventViewModel model)
         {

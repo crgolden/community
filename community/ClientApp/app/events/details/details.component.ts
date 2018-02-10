@@ -1,6 +1,5 @@
 import { Component } from "@angular/core";
-import { Router } from "@angular/router";
-import { ActivatedRoute } from "@angular/router";
+import { Router, ActivatedRoute } from "@angular/router";
 import { Location } from "@angular/common";
 
 import { EventsService } from "../events.service"
