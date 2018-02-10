@@ -16,7 +16,6 @@ export class CreateComponent {
     errors: string = "";
     isRequesting: boolean = false;
     submitted: boolean = false;
-    event: Event;
 
     constructor(
         private readonly eventsService: EventsService,
@@ -29,12 +28,14 @@ export class CreateComponent {
         var that = this;
 
         if (valid) {
+            that.submitted = true;
             that.isRequesting = true;
+            value.userId = that.eventsService.user.id;
             that.eventsService
                 .createEvent(value)
                 .finally(() => that.isRequesting = false)
                 .subscribe(res => {
-                    if (typeof res.id !== "undefined" && res.id.length > 0) {
+                    if (typeof res.id !== "undefined" && res.id.length === 36) {
                         that.router.navigate([`/events/details/${res.id}`]);
                     }
                 },

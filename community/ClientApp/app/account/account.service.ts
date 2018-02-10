@@ -1,5 +1,5 @@
 ﻿import { Injectable } from "@angular/core";
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs/Rx";
 
 import { AppService } from "../app.service";
@@ -11,62 +11,48 @@ import { ILogin } from "./login/login.interface";
 @Injectable()
 export class AccountService extends AppService {
 
-    private loggedIn: boolean = false;
-    private user: User;
-
     constructor(private readonly http: HttpClient) {
         super();
-        this.user = new User();
     }
 
-    register(value: IRegister): Observable<void> {
+    register(value: IRegister): Observable<boolean> {
 
-        var that = this;
-        const body = JSON.stringify(value),
-            httpOptions = {
-                headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-            }
+        const that = this,
+            body = JSON.stringify(value),
+            options = { headers: that.headers }
 
         return that.http
-            .post<User>("/account/register", body, httpOptions)
+            .post<User>("/account/register", body, options)
             .map(res => {
-                    that.setUser(res);
-                    that.loggedIn = true;
+                that.setUser(res);
+                return true;
             })
             .catch(that.handleError);
     }
 
     login(value: ILogin): Observable<boolean> {
-
-        var that = this;
-        const body = JSON.stringify(value),
-            httpOptions = {
-                headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-            };
+        const that = this,
+            body = JSON.stringify(value),
+            options = { headers: that.headers };
 
         return that.http
-            .post<User>("/account/login", body, httpOptions)
+            .post<User>("/account/login", body, options)
             .map(res => {
-                    that.setUser(res);
-                    that.loggedIn = true;
+                that.setUser(res);
+                return true;
             })
             .catch(that.handleError);
     }
 
     logout() {
-        this.user = new User();
-        this.loggedIn = false;
-    }
+        const that = this,
+            options = { headers: that.headers };
 
-    isLoggedIn() {
-        return this.loggedIn;
-    }
-
-    private setUser(user: any) {
-        this.user.email = user.email;
-        this.user.id = user.id;
-        this.user.firstName = user.firstName;
-        this.user.lastName = user.lastName;
-        this.user.token = user.token;
+        return that.http
+            .post<true>("/account/logout", null, options)
+            .map(() => {
+                that.removeUser();
+            })
+            .catch(that.handleError);
     }
 }

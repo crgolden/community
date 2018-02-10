@@ -16,7 +16,6 @@ export class CreateComponent {
     errors: string = "";
     isRequesting: boolean = false;
     submitted: boolean = false;
-    address: Address;
 
     constructor(
         private readonly addressesService: AddressesService,
@@ -29,7 +28,9 @@ export class CreateComponent {
         var that = this;
 
         if (valid) {
+            that.submitted = true;
             that.isRequesting = true;
+            value.userId = that.addressesService.user.id;
             that.addressesService
                 .createAddress(value)
                 .finally(() => that.isRequesting = false)

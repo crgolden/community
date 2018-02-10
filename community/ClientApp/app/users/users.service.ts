@@ -1,5 +1,5 @@
 ﻿import { Injectable } from "@angular/core";
-import { HttpClient } from '@angular/common/http';
+import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs/Rx";
 
 import { AppService } from "../app.service";
@@ -19,7 +19,7 @@ export class UsersService extends AppService {
             .catch(this.handleError);
     }
 
-    getUser(id: string): Observable<User> {
+    details(id: string): Observable<User> {
         
         return this.http
             .get<User>(`/users/details/?id=${id}`)

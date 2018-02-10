@@ -44,29 +44,44 @@ namespace community.Controllers
             return Json(@event);
         }
 
-        //// GET: Events/Create
-        //public IActionResult Create()
-        //{
-        //    ViewData["AddressId"] = new SelectList(_context.Addresses, "Id", "Id");
-        //    ViewData["UserId"] = new SelectList(_context.User, "Id", "Id");
-        //    return View();
-        //}
-
-        // POST: Events/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [AllowAnonymous]
         //TODO [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([FromBody, Bind("Id,Name,Details,Date,UserId,AddressId")] Event @event)
+        public async Task<IActionResult> Create([FromBody, Bind("Id,Name,Details,Date,UserId,AddressId,Street,Street2,City,State,ZipCode")] EventViewModel model)
         {
-            if (!ModelState.IsValid) return Json(@event);
+            if (!ModelState.IsValid) return Json(model);
 
-            @event.Id = Guid.NewGuid();
-            _context.Add(@event);
-            await _context.SaveChangesAsync();
+            var address = await _context.Addresses.FirstOrDefaultAsync(x => x.Street.Equals(model.Street, StringComparison.InvariantCultureIgnoreCase) &&
+                                                                            x.City.Equals(model.City, StringComparison.InvariantCultureIgnoreCase) &&
+                                                                            x.State.Equals(model.State, StringComparison.InvariantCultureIgnoreCase) &&
+                                                                            x.ZipCode.Equals(model.ZipCode, StringComparison.InvariantCultureIgnoreCase));
+            if (address == null)
+            {
+                address = new Address
+                {
+                    Street = model.Street,
+                    Street2 = model.Street2,
+                    City = model.City,
+                    State = model.State,
+                    ZipCode = model.ZipCode
+                };
+                await _context.Addresses.AddAsync(address);
+            }
+            var @event = new Event
+            {
+                Id = Guid.NewGuid(),
+                Name = model.Name,
+                Date = model.Date,
+                Details = model.Details,
+                UserId = model.UserId,
+                Address = address
+            };
+            await _context.Events.AddAsync(@event);
 
-            return Json(new EventViewModel(@event));
+            if (await _context.SaveChangesAsync() <= 0) return Json(model);
+
+            model.Id = @event.Id;
+            model.AddressId = @event.AddressId;
+            return Json(model);
         }
 
         // GET: Events/Edit/5

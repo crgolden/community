@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -49,14 +50,13 @@ namespace community.Controllers
         //    // Clear the existing external cookie to ensure a clean login process
         //    await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
-        //    ViewData["ReturnUrl"] = returnUrl;
-        //    return View();
+        //    return RedirectToAction("Login", new LoginViewModel { ReturnUrl = returnUrl });
         //}
 
         [HttpPost]
         [AllowAnonymous]
         //TODO [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login([FromBody] LoginViewModel model)
+        public async Task<IActionResult> Login([FromBody] LoginViewModel model,  string returnUrl = null)
         {
             var user = new User {Email = model.Email};
             if (!ModelState.IsValid)
@@ -71,7 +71,7 @@ namespace community.Controllers
                 var generator = new TokenGenerator(_configuration, _userManager);
                 var token = await generator.GenerateToken(user);
                 _logger.LogInformation("User logged in.");
-                return Json(new UserViewModel(user){ Token = token });
+                return Json(new UserViewModel(user){ Token = token, ReturnUrl = model.ReturnUrl});
             }
             if (result.RequiresTwoFactor)
             {
@@ -245,7 +245,7 @@ namespace community.Controllers
         {
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
-            return RedirectToAction(nameof(HomeController.Index), "Home");
+            return Json(true);
         }
 
         [HttpPost]

@@ -1,5 +1,5 @@
 ﻿import { Injectable } from "@angular/core";
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs/Rx";
 
 import { AppService } from "../app.service";
@@ -30,12 +30,10 @@ export class EventsService extends AppService {
 
         const that = this,
             body = JSON.stringify(event),
-            httpOptions = {
-                headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-            }
-
+            options = { headers: that.headers };
+        
         return that.http
-            .post<Event>("/events/create", body, httpOptions)
+            .post<Event>("/events/create", body, options)
             .catch(that.handleError);
     }
 }

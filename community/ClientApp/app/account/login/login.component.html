@@ -9,11 +9,21 @@
         <label for="password">Password</label>
         <input id="password" name="password" type="password" required class="form-control" placeholder="Password" ngModel>
     </div>
-
+    <div class="form-group">
+        <label for="rememberMe">Remember Me</label>
+        <input id="rememberMe" name="rememberMe" type="checkbox" ngModel>
+    </div>
     <div class="form-group">
         <button type="submit" class="btn btn-primary" [disabled]="f.invalid">Login</button>
     </div>
-
+    <div class="form-group">
+        <p>
+            <a href="">Forgot your password?</a>
+        </p>
+        <p>
+            <a href="">Register as a new user?</a>
+        </p>
+    </div>
     <div *ngIf="errors" class="alert alert-danger" role="alert">
         <strong>Oops!</strong> {{errors}}
     </div>

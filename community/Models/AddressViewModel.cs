@@ -21,6 +21,10 @@ namespace community.Models
         public string FullAddress =>
             $"{Street}{(string.IsNullOrEmpty(Street2) ? string.Empty : $" {Street2}")}, {City}, {State} {ZipCode}";
 
+        public AddressViewModel()
+        {
+        }
+
         public AddressViewModel(Address address)
         {
             Id = address.Id;

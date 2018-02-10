@@ -27,8 +27,8 @@ export class LoginComponent {
             that.accountService
                 .login(value)
                 .finally(() => that.isRequesting = false)
-                .subscribe(() => {
-                    if (that.accountService.isLoggedIn()) {
+                .subscribe((res) => {
+                    if (res) {
                         if (typeof value.returnUrl !== "undefined") {
                             that.router.navigate([value.returnUrl]);
                         } else {

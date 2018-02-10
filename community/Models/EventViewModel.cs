@@ -17,6 +17,10 @@ namespace community.Models
         public string State { get; set; }
         public string ZipCode { get; set; }
 
+        public EventViewModel()
+        {
+        }
+
         public EventViewModel(Event @event)
         {
             Id = @event.Id;

@@ -22,7 +22,8 @@ export class DetailsComponent {
         private readonly usersService: UsersService,
         private readonly router: Router,
         private readonly route: ActivatedRoute,
-        private readonly location: Location) { }
+        private readonly location: Location) {
+    }
 
     ngOnInit(): void {
 
@@ -31,7 +32,7 @@ export class DetailsComponent {
         
         if (typeof id === "string") {
             that.usersService
-                .getUser(id)
+                .details(id)
                 .subscribe(user => {
                     that.user = user;
                 },
