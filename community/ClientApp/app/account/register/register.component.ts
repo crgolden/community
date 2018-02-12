@@ -33,7 +33,6 @@ export class RegisterComponent {
                 .finally(() => that.isRequesting = false)
                 .subscribe(
                     (res: boolean | string) => {
-                        debugger;
                         if (typeof res == "boolean" && res)
                             if (typeof that.accountService.getReturnUrl() == "string") {
                                 that.router.navigate([that.accountService.getReturnUrl()]);
