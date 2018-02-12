@@ -6,8 +6,8 @@ import { ActivatedRoute } from "@angular/router";
 import { AppService } from "../app.service";
 import { User } from "../users/user"
 
-import { IRegister } from "./register/register.interface";
-import { ILogin } from "./login/login.interface";
+import { Register } from "./register/register";
+import { Login } from "./login/login";
 
 @Injectable()
 export class AccountService extends AppService {
@@ -21,7 +21,7 @@ export class AccountService extends AppService {
         this.setReturnUrlFromQueryParams();
     }
 
-    register(value: IRegister): Observable<string | boolean> {
+    register(value: Register): Observable<string | boolean> {
 
         const that = this,
             body = JSON.stringify(value),
@@ -38,7 +38,7 @@ export class AccountService extends AppService {
             .catch(that.handleError);
     }
 
-    login(value: ILogin): Observable<string | boolean> {
+    login(value: Login): Observable<string | boolean> {
         const that = this,
             body = JSON.stringify(value),
             options = { headers: that.getHeaders() };

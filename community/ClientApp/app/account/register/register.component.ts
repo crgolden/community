@@ -2,7 +2,7 @@ import { Component } from "@angular/core";
 import { Router } from "@angular/router";
 
 import { AccountService } from "../account.service"
-import { IRegister } from "./register.interface"
+import { Register } from "./register"
 
 @Component({
     selector: "register",
@@ -14,13 +14,14 @@ export class RegisterComponent {
     errors: string = "";
     isRequesting: boolean = false;
     submitted: boolean = false;
+    value = new Register();
 
     constructor(
         private readonly accountService: AccountService,
         private readonly router: Router) {
     }
 
-    register({ value, valid }: { value: IRegister, valid: boolean }) {
+    register({ value, valid }: { value: Register, valid: boolean }) {
 
         var that = this;
 

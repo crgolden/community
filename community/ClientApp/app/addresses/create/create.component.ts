@@ -14,6 +14,7 @@ export class CreateComponent {
     errors: string = "";
     isRequesting: boolean = false;
     submitted: boolean = false;
+    value = new Address();
 
     constructor(
         private readonly addressesService: AddressesService,

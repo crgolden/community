@@ -2,7 +2,7 @@ import { Component } from "@angular/core";
 import { Router } from "@angular/router";
 
 import { AccountService } from "../account.service"
-import { ILogin } from "./login.interface"
+import { Login } from "./login"
 
 @Component({
     selector: "login",
@@ -14,13 +14,14 @@ export class LoginComponent {
     errors: string = "";
     isRequesting: boolean = false;
     submitted: boolean = false;
+    value = new Login();
 
     constructor(
         private readonly accountService: AccountService,
         private readonly router: Router) {
     }
 
-    login({ value, valid }: { value: ILogin, valid: boolean }) {
+    login({ value, valid }: { value: Login, valid: boolean }) {
 
         var that = this;
 

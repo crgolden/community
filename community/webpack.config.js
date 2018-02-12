@@ -1,7 +1,7 @@
 const path = require("path");
 const webpack = require("webpack");
 const merge = require("webpack-merge");
-const AotPlugin = require("@ngtools/webpack").AotPlugin;
+const AotPlugin = require("@ngtools/webpack").AngularCompilerPlugin;
 const CheckerPlugin = require("awesome-typescript-loader").CheckerPlugin;
 
 module.exports = (env) => {
@@ -18,7 +18,7 @@ module.exports = (env) => {
         module: {
             rules: [
                 {
-                    test: /\.ts$/,
+                    test: /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/,
                     include: /ClientApp/,
                     use: isDevBuild
                         ? ["awesome-typescript-loader?silent=true", "angular2-template-loader"]
@@ -59,7 +59,8 @@ module.exports = (env) => {
                     new AotPlugin({
                         tsConfigPath: "./tsconfig.json",
                         entryModule: path.join(__dirname, "ClientApp/app/app.module.browser#AppModule"),
-                        exclude: ["./**/*.server.ts"]
+                        exclude: ["./**/*.server.ts"],
+                        sourceMap: true
                     })
                 ])
         });
@@ -83,6 +84,7 @@ module.exports = (env) => {
                     new AotPlugin({
                         tsConfigPath: "./tsconfig.json",
                         entryModule: path.join(__dirname, "ClientApp/app/app.module.server#AppModule"),
+                        sourceMap: true,
                         exclude: ["./**/*.browser.ts"]
                     })
                 ]),
