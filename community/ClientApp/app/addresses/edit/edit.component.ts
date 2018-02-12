@@ -5,13 +5,15 @@ import { AddressesService } from "../addresses.service"
 import { Address } from "../address"
 
 @Component({
-    selector: "addresses-details",
-    templateUrl: "./details.component.html",
-    styleUrls: ["./details.component.css"]
+    selector: "addresses-edit",
+    templateUrl: "./edit.component.html",
+    styleUrls: ["./edit.component.css"]
 })
-export class DetailsComponent {
+export class EditComponent {
 
     errors: string = "";
+    isRequesting: boolean = false;
+    submitted: boolean = false;
     address = new Address();
 
     constructor(
@@ -35,6 +37,30 @@ export class DetailsComponent {
                             that.address.city = address.city;
                             that.address.state = address.state;
                             that.address.zipCode = address.zipCode;
+                        }
+                    },
+                    (error: string) => that.errors = error);
+        }
+    }
+
+    edit({ value, valid }: { value: Address, valid: boolean }) {
+        var that = this;
+        that.submitted = true;
+
+        if (valid) {
+            that.isRequesting = true;
+            that.address.street = value.street;
+            that.address.street2 = value.street2;
+            that.address.city = value.city;
+            that.address.state = value.state;
+            that.address.zipCode = value.zipCode;
+            that.addressesService.edit(that.address)
+                .finally(
+                    () => that.isRequesting = false)
+                .subscribe(
+                    (address: Address[] | Address | string) => {
+                        if (that.addressesService.isAddress(address)) {
+                            that.router.navigate([`/Addresses/Details/${address.id}`]);
                         }
                     },
                     (error: string) => that.errors = error);

@@ -1,34 +1,53 @@
-<h2>Register</h2>
+<div class="row">
+    <div class="col-sm-1 col-md-3"></div>
+    <div class="col-sm-10 col-md-6">
+        <h2>Register</h2>
+        <hr />
+    </div>
+    <div class="col-sm-1 col-md-3"></div>
+</div>
+<div class="row">
+    <div class="col-sm-1 col-md-3"></div>
+    <div class="col-sm-10 col-md-6">
+        <form #f="ngForm" novalidate (ngSubmit)="register(f)">
 
-<form #f="ngForm" novalidate (ngSubmit)="register(f)">
-    <div class="form-group">
-        <label for="first-name">First name</label>
-        <input type="text" class="form-control" id="first-name" placeholder="First name" name="firstName" tmFocus ngModel>
-    </div>
-    <div class="form-group">
-        <label for="last-name">Last name</label>
-        <input type="text" class="form-control" id="last-name" placeholder="Last name" name="lastName" ngModel>
-    </div>
-    <div class="form-group">
-        <label for="email">Email</label>
-        <input id="email" type="text" required name="email" validateEmail class="form-control" placeholder="Email" ngModel #email="ngModel">
-        <small [hidden]="email.valid || (email.pristine && !submitted)" class="text-danger">Please enter a valid email</small>
-    </div>
-    <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" class="form-control" id="password" name="password" placeholder="Password" ngModel>
-    </div>
-    <div class="form-group">
-        <label for="location">Location</label>
-        <input type="text" class="form-control" id="location" placeholder="Location" required name="location" ngModel>
-    </div>
+            <div class="form-group">
+                <label for="firstName">First name</label>
+                <input [(ngModel)]="firstName" type="text" class="form-control" id="firstName" name="firstName" placeholder="First name" tmFocus>
+            </div>
 
-    <div class="form-group">
-        <button type="submit" class="btn btn-primary" [disabled]="f.invalid || isRequesting">Sign Up</button>
-    </div>
+            <div class="form-group">
+                <label for="lastName">Last name</label>
+                <input [(ngModel)]="lastName" type="text" class="form-control" id="lastName" name="lastName" placeholder="Last name">
+            </div>
 
-    <div *ngIf="errors" class="alert alert-danger" role="alert">
-        <strong>Oops!</strong> {{errors}}
-    </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input [(ngModel)]="email" id="email" type="text" required name="email" validateEmail class="form-control" placeholder="Email" #field="ngModel">
+                <div [hidden]="field.valid || field.pristine" class="alert alert-danger">
+                    Please enter a valid email
+                </div>
+            </div>
 
-</form>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input [(ngModel)]="password" type="password" class="form-control" id="password" name="password" placeholder="Password">
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input [(ngModel)]="confirmPassword" type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password">
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary" [disabled]="f.invalid || isRequesting">Register</button>
+            </div>
+
+            <div *ngIf="errors" class="alert alert-danger" role="alert">
+                <strong>Oops!</strong> {{errors}}
+            </div>
+
+        </form>
+    </div>
+    <div class="col-sm-1 col-md-3"></div>
+</div>

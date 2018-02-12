@@ -1,7 +1,5 @@
 import { Component } from "@angular/core";
 import { Router } from "@angular/router";
-import { ActivatedRoute } from "@angular/router";
-import { Location } from "@angular/common";
 
 import { AddressesService } from "../addresses.service"
 import { Address } from "../address"
@@ -19,31 +17,26 @@ export class CreateComponent {
 
     constructor(
         private readonly addressesService: AddressesService,
-        private readonly router: Router,
-        private readonly route: ActivatedRoute,
-        private readonly location: Location) { }
-
-    saveAddress({ value, valid }: { value: Address, valid: boolean }) {
-
-        var that = this;
-
-        if (valid) {
-            that.submitted = true;
-            that.isRequesting = true;
-            value.userId = that.addressesService.user.id;
-            that.addressesService
-                .createAddress(value)
-                .finally(() => that.isRequesting = false)
-                .subscribe(res => {
-                    if (typeof res.id !== "undefined" && res.id.length > 0) {
-                        that.router.navigate([`/addresses/details/${res.id}`]);
-                    }
-                },
-                error => that.errors = error);
-        }
+        private readonly router: Router) {
     }
 
-    goBack(): void {
-        this.location.back();
+    create({ value, valid }: { value: Address, valid: boolean }) {
+        var that = this;
+        that.submitted = true;
+
+        if (valid) {
+            that.isRequesting = true;
+            value.userId = that.addressesService.getUser().id;
+            that.addressesService.create(value)
+                .finally(
+                    () => that.isRequesting = false)
+                .subscribe(
+                    (address: Address[] | Address | string) => {
+                        if (that.addressesService.isAddress(address)) {
+                            that.router.navigate([`/Addresses/Details/${address.id}`]);
+                        }
+                    },
+                    (error: string) => that.errors = error);
+        }
     }
 }

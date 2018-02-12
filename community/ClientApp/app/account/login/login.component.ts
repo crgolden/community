@@ -1,11 +1,11 @@
 import { Component } from "@angular/core";
-import { Router, ActivatedRoute } from "@angular/router";
+import { Router } from "@angular/router";
 
 import { AccountService } from "../account.service"
 import { ILogin } from "./login.interface"
 
 @Component({
-    selector: "app-login-form",
+    selector: "login",
     templateUrl: "./login.component.html",
     styleUrls: ["./login.component.css"]
 })
@@ -14,23 +14,15 @@ export class LoginComponent {
     errors: string = "";
     isRequesting: boolean = false;
     submitted: boolean = false;
-    readonly returnUrl: string;
 
     constructor(
         private readonly accountService: AccountService,
-        private readonly route: ActivatedRoute,
         private readonly router: Router) {
-        route.queryParams.subscribe(params => {
-        debugger;
-        this.returnUrl = params['ReturnUrl'];
-    });
-        }
+    }
 
     login({ value, valid }: { value: ILogin, valid: boolean }) {
 
         var that = this;
-        const returnUrl = this.route.snapshot.paramMap.get("returnUrl");
-        debugger;
 
         that.submitted = true;
 
@@ -39,16 +31,18 @@ export class LoginComponent {
             that.accountService
                 .login(value)
                 .finally(() => that.isRequesting = false)
-                .subscribe((res) => {
-                    if (res) {
-                        if (typeof value.returnUrl !== "undefined") {
-                            that.router.navigate([value.returnUrl]);
-                        } else {
-                            that.router.navigate(["/"]);
+                .subscribe(
+                    (res: boolean | string) => {
+                        if (typeof res == "boolean" && res) {
+                            if (typeof that.accountService.getReturnUrl() == "string") {
+                                that.router.navigate([that.accountService.getReturnUrl()]);
+                                that.accountService.setReturnUrl("");
+                            } else {
+                                that.router.navigate(["/Home"]);
+                            }
                         }
-                    }
-                },
-                error => that.errors = error);
+                    },
+                    (error: string) => that.errors = error);
         }
     }
 }

@@ -22,7 +22,11 @@
 
   <ItemGroup>
     <!-- Files not to publish (note that the 'dist' subfolders are re-added below) -->
+    <Compile Remove="wwwroot\lib\**" />
     <Content Remove="ClientApp\**" />
+    <Content Remove="wwwroot\lib\**" />
+    <EmbeddedResource Remove="wwwroot\lib\**" />
+    <None Remove="wwwroot\lib\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,11 +35,11 @@
     <None Remove="ClientApp\app\addresses\address.ts" />
     <None Remove="ClientApp\app\addresses\addresses.module.ts" />
     <None Remove="ClientApp\app\addresses\addresses.service.ts" />
+    <None Remove="ClientApp\app\app.can-activate.ts" />
     <None Remove="ClientApp\app\app.service.ts" />
     <None Remove="ClientApp\app\events\event.ts" />
     <None Remove="ClientApp\app\events\events.module.ts" />
     <None Remove="ClientApp\app\events\events.service.ts" />
-    <None Remove="ClientApp\app\models\user.ts" />
     <None Remove="ClientApp\app\users\users.module.ts" />
     <None Remove="ClientApp\app\users\users.service.ts" />
   </ItemGroup>
@@ -49,6 +53,7 @@
     <TypeScriptCompile Include="ClientApp\app\addresses\address.ts" />
     <TypeScriptCompile Include="ClientApp\app\addresses\addresses.module.ts" />
     <TypeScriptCompile Include="ClientApp\app\addresses\addresses.service.ts" />
+    <TypeScriptCompile Include="ClientApp\app\app.can-activate.ts" />
     <TypeScriptCompile Include="ClientApp\app\events\event.ts" />
     <TypeScriptCompile Include="ClientApp\app\events\events.module.ts" />
     <TypeScriptCompile Include="ClientApp\app\events\events.service.ts" />
@@ -80,7 +85,7 @@
     <!-- Include the newly-built files in the publish output -->
     <ItemGroup>
       <DistFiles Include="wwwroot\dist\**; ClientApp\dist\**" />
-      <ResolvedFileToPublish Include="@(DistFiles-&gt;'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
+      <ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
         <RelativePath>%(DistFiles.Identity)</RelativePath>
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       </ResolvedFileToPublish>

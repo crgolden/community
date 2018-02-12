@@ -12,22 +12,23 @@ import { User } from "../user"
 export class IndexComponent {
 
     errors: string = "";
-    isRequesting: boolean = false;
-    submitted: boolean = false;
-    users: User[];
+    users = new Array<User>();
 
-    constructor(private readonly usersService: UsersService, private readonly router: Router) { }
-
-    ngOnInit(): void {
-
-        var that = this;
-
-        that.usersService
-            .getUsers()
-            .subscribe(users => {
-                    that.users = users;
-                },
-                error => that.errors = error);
+    constructor(
+        private readonly usersService: UsersService,
+        private readonly router: Router) {
     }
 
+    ngOnInit(): void {
+        var that = this;
+
+        that.usersService.index()
+            .subscribe(
+                (users: User[] | string) => {
+                    if (users instanceof Array) {
+                        that.users = users;
+                    }
+                },
+                (error: string) => that.errors = error);
+    }
 }

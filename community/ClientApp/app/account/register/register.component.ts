@@ -5,7 +5,7 @@ import { AccountService } from "../account.service"
 import { IRegister } from "./register.interface"
 
 @Component({
-    selector: "app-registration-form",
+    selector: "register",
     templateUrl: "./register.component.html",
     styleUrls: ["./register.component.css"]
 })
@@ -15,11 +15,15 @@ export class RegisterComponent {
     isRequesting: boolean = false;
     submitted: boolean = false;
 
-    constructor(private readonly accountService: AccountService, private readonly router: Router) {}
+    constructor(
+        private readonly accountService: AccountService,
+        private readonly router: Router) {
+    }
 
     register({ value, valid }: { value: IRegister, valid: boolean }) {
 
         var that = this;
+
         that.submitted = true;
 
         if (valid) {
@@ -28,16 +32,17 @@ export class RegisterComponent {
                 .register(value)
                 .finally(() => that.isRequesting = false)
                 .subscribe(
-                    result => {
-                        if (result) {
-                            if (typeof value.returnUrl !== "undefined") {
-                                that.router.navigate([value.returnUrl]);
+                    (res: boolean | string) => {
+                        debugger;
+                        if (typeof res == "boolean" && res)
+                            if (typeof that.accountService.getReturnUrl() == "string") {
+                                that.router.navigate([that.accountService.getReturnUrl()]);
+                                that.accountService.setReturnUrl("");
                             } else {
-                                that.router.navigate(["/"]);
+                                that.router.navigate(["/Home"]);
                             }
-                        }
                     },
-                    errors => that.errors = errors);
+                    (error: string) => that.errors = error);
         }
     }
 }

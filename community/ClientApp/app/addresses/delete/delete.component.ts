@@ -5,11 +5,11 @@ import { AddressesService } from "../addresses.service"
 import { Address } from "../address"
 
 @Component({
-    selector: "addresses-details",
-    templateUrl: "./details.component.html",
-    styleUrls: ["./details.component.css"]
+    selector: "addresses-delete",
+    templateUrl: "./delete.component.html",
+    styleUrls: ["./delete.component.css"]
 })
-export class DetailsComponent {
+export class DeleteComponent {
 
     errors: string = "";
     address = new Address();
@@ -22,7 +22,7 @@ export class DetailsComponent {
 
     ngOnInit(): void {
         var that = this;
-        const id = that.route.snapshot.paramMap.get("id");
+        const id = this.route.snapshot.paramMap.get("id");
 
         if (typeof id == "string" && id.length === 36) {
             that.addressesService.details(id)
@@ -35,6 +35,21 @@ export class DetailsComponent {
                             that.address.city = address.city;
                             that.address.state = address.state;
                             that.address.zipCode = address.zipCode;
+                        }
+                    },
+                    (error: string) => that.errors = error);
+        }
+    }
+
+    delete() {
+        var that = this;
+
+        if (typeof that.address.id == "string" && that.address.id.length === 36) {
+            that.addressesService.delete(that.address.id)
+                .subscribe(
+                    res => {
+                        if (typeof res == "boolean" && res) {
+                            that.router.navigate(["/Addresses"]);
                         }
                     },
                     (error: string) => that.errors = error);

@@ -1,7 +1,5 @@
 import { Component } from "@angular/core";
 import { Router } from "@angular/router";
-import { ActivatedRoute } from "@angular/router";
-import { Location } from "@angular/common";
 
 import { EventsService } from "../events.service"
 import { Event } from "../event"
@@ -19,31 +17,26 @@ export class CreateComponent {
 
     constructor(
         private readonly eventsService: EventsService,
-        private readonly router: Router,
-        private readonly route: ActivatedRoute,
-        private readonly location: Location) { }
-
-    saveEvent({ value, valid }: { value: Event, valid: boolean }) {
-
-        var that = this;
-
-        if (valid) {
-            that.submitted = true;
-            that.isRequesting = true;
-            value.userId = that.eventsService.user.id;
-            that.eventsService
-                .createEvent(value)
-                .finally(() => that.isRequesting = false)
-                .subscribe(res => {
-                    if (typeof res.id !== "undefined" && res.id.length === 36) {
-                        that.router.navigate([`/events/details/${res.id}`]);
-                    }
-                },
-                error => that.errors = error);
-        }
+        private readonly router: Router) {
     }
 
-    goBack(): void {
-        this.location.back();
+    create({ value, valid }: { value: Event, valid: boolean }) {
+        var that = this;
+        that.submitted = true;
+
+        if (valid) {
+            that.isRequesting = true;
+            value.userId = that.eventsService.getUser().id;
+            that.eventsService.create(value)
+                .finally(
+                    () => that.isRequesting = false)
+                .subscribe(
+                    (event: Event[] | Event | string) => {
+                        if (that.eventsService.isEvent(event)) {
+                            that.router.navigate([`/Events/Details/${event.id}`]);
+                        }
+                    },
+                    (error: string) => that.errors = error);
+        }
     }
 }

@@ -1,7 +1,7 @@
 ﻿import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
-import { RouterModule } from '@angular/router';
+import { RouterModule } from "@angular/router";
 
 import { AccountService } from "./account.service";
 
@@ -13,8 +13,8 @@ import { LoginComponent } from "./login/login.component";
         CommonModule,
         FormsModule,
         RouterModule.forChild([
-            { path: 'account/register', component: RegisterComponent },
-            { path: 'account/login', component: LoginComponent }
+            { path: "Account/Register", component: RegisterComponent },
+            { path: "Account/Login", component: LoginComponent }
         ])
     ],
     declarations: [

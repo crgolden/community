@@ -1,7 +1,5 @@
 import { Component } from "@angular/core";
-import { Router } from "@angular/router";
-import { ActivatedRoute } from "@angular/router";
-import { Location } from "@angular/common";
+import { Router, ActivatedRoute } from "@angular/router";
 
 import { UsersService } from "../users.service"
 import { User } from "../user"
@@ -14,33 +12,29 @@ import { User } from "../user"
 export class DetailsComponent {
 
     errors: string = "";
-    isRequesting: boolean = false;
-    submitted: boolean = false;
-    user: User;
+    user = new User();
 
     constructor(
         private readonly usersService: UsersService,
         private readonly router: Router,
-        private readonly route: ActivatedRoute,
-        private readonly location: Location) {
+        private readonly route: ActivatedRoute) {
     }
 
     ngOnInit(): void {
-
         var that = this;
-        const id = this.route.snapshot.paramMap.get("id");
-        
-        if (typeof id === "string") {
-            that.usersService
-                .details(id)
-                .subscribe(user => {
-                    that.user = user;
-                },
-                error => that.errors = error);
-        }
-    }
+        const id = that.route.snapshot.paramMap.get("id");
 
-    goBack(): void {
-        this.location.back();
+        if (typeof id == "string" && id.length === 36) {
+            that.usersService.details(id)
+                .subscribe(
+                    (user: User[] | User | string) => {
+                        if (that.usersService.isUser(user)) {
+                            that.user.id = user.id;
+                            that.user.firstName = user.firstName;
+                            that.user.lastName = user.lastName;
+                        }
+                    },
+                    (error: string) => that.errors = error);
+        }
     }
 }

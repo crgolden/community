@@ -1,7 +1,7 @@
 <div class="row">
     <div class="col-sm-1 col-md-3"></div>
     <div class="col-sm-10 col-md-6">
-        <h2>Event Details</h2>
+        <h2>Delete Address</h2>
         <hr />
     </div>
     <div class="col-sm-1 col-md-3"></div>
@@ -11,22 +11,34 @@
     <div class="col-sm-10 col-md-6">
         <dl>
             <dt>
-                Name
+                Street
             </dt>
             <dd>
-                {{event.name}}
+                {{address.street}}
             </dd>
             <dt>
-                Details
+                Street2
             </dt>
             <dd>
-                {{event.details}}
+                {{address.street2}}
             </dd>
             <dt>
-                Date
+                City
             </dt>
             <dd>
-                {{event.date | date}}
+                {{address.city}}
+            </dd>
+            <dt>
+                State
+            </dt>
+            <dd>
+                {{address.state}}
+            </dd>
+            <dt>
+                Zip Code
+            </dt>
+            <dd>
+                {{address.zipCode}}
             </dd>
         </dl>
     </div>
@@ -36,11 +48,10 @@
     <div class="col-sm-1 col-md-3"></div>
     <div class="col-sm-10 col-md-6">
         <hr />
-        <h4>
-            <a routerLink="/Events/Edit/{{event.id}}">Edit</a> |
-            <a routerLink="/Events/Delete/{{event.id}}">Delete</a> |
-            <a routerLink="/Events">Back to List</a>
-        </h4>
+        <form novalidate (ngSubmit)="delete()">
+            <input type="submit" value="Delete" class="btn btn-primary" /> |
+            <a routerLink="/Addresses">Back to List</a>
+        </form>
     </div>
     <div class="col-sm-1 col-md-3"></div>
 </div>

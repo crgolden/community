@@ -5,11 +5,11 @@ import { EventsService } from "../events.service"
 import { Event } from "../event"
 
 @Component({
-    selector: "events-details",
-    templateUrl: "./details.component.html",
-    styleUrls: ["./details.component.css"]
+    selector: "events-delete",
+    templateUrl: "./delete.component.html",
+    styleUrls: ["./delete.component.css"]
 })
-export class DetailsComponent {
+export class DeleteComponent {
 
     errors: string = "";
     event = new Event();
@@ -22,7 +22,7 @@ export class DetailsComponent {
 
     ngOnInit(): void {
         var that = this;
-        const id = that.route.snapshot.paramMap.get("id");
+        const id = this.route.snapshot.paramMap.get("id");
 
         if (typeof id == "string" && id.length === 36) {
             that.eventsService.details(id)
@@ -33,6 +33,21 @@ export class DetailsComponent {
                             that.event.name = event.name;
                             that.event.details = event.details;
                             that.event.date = event.date;
+                        }
+                    },
+                    (error: string) => that.errors = error);
+        }
+    }
+
+    delete() {
+        var that = this;
+
+        if (typeof that.event.id == "string" && that.event.id.length === 36) {
+            that.eventsService.delete(that.event.id)
+                .subscribe(
+                    res => {
+                        if (typeof res == "boolean" && res) {
+                            that.router.navigate(["/Events"]);
                         }
                     },
                     (error: string) => that.errors = error);

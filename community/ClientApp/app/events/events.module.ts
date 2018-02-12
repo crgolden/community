@@ -1,14 +1,17 @@
 ﻿import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
-import { RouterModule } from '@angular/router';
-import { HttpClientModule } from '@angular/common/http';
+import { RouterModule } from "@angular/router";
+import { HttpClientModule } from "@angular/common/http";
 
 import { IndexComponent } from "./index/index.component"
 import { DetailsComponent } from "./details/details.component"
 import { CreateComponent } from "./create/create.component"
+import { EditComponent } from "./edit/edit.component"
+import { DeleteComponent } from "./delete/delete.component"
 
 import { EventsService } from "./events.service"
+import { AppCanActivate } from "../app.can-activate"
 
 @NgModule({
     imports: [
@@ -16,18 +19,23 @@ import { EventsService } from "./events.service"
         FormsModule,
         HttpClientModule,
         RouterModule.forChild([
-            { path: 'events', component: IndexComponent },
-            { path: 'events/details/:id', component: DetailsComponent },
-            { path: 'events/create', component: CreateComponent }
+            { path: "Events", component: IndexComponent },
+            { path: "Events/Details/:id", component: DetailsComponent },
+            { path: "Events/Create", component: CreateComponent, canActivate: [AppCanActivate] },
+            { path: "Events/Edit/:id", component: EditComponent, canActivate: [AppCanActivate] },
+            { path: "Events/Delete/:id", component: DeleteComponent, canActivate: [AppCanActivate] }
         ])
     ],
     declarations: [
         IndexComponent,
         DetailsComponent,
-        CreateComponent
+        CreateComponent,
+        EditComponent,
+        DeleteComponent
     ],
     providers: [
-        EventsService
+        EventsService,
+        AppCanActivate
     ]
 })
 export class EventsModule {

@@ -6,17 +6,15 @@ using community.Extensions;
 using community.Models;
 using community.Models.AccountViewModels;
 using community.Services;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace community.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "User")]
     [Route("[controller]/[action]")]
     public class AccountController : Controller
     {
@@ -43,20 +41,10 @@ namespace community.Controllers
         [TempData]
         public string ErrorMessage { get; set; }
 
-        //[HttpGet]
-        //[AllowAnonymous]
-        //public async Task<IActionResult> Login(string returnUrl = null)
-        //{
-        //    // Clear the existing external cookie to ensure a clean login process
-        //    await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
-
-        //    return RedirectToAction("Login", new LoginViewModel { ReturnUrl = returnUrl });
-        //}
-
+        // TODO [ValidateAntiForgeryToken]
         [HttpPost]
         [AllowAnonymous]
-        //TODO [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login([FromBody] LoginViewModel model,  string returnUrl = null)
+        public async Task<IActionResult> Login([FromBody] LoginViewModel model, string returnUrl = null)
         {
             var user = new User {Email = model.Email};
             if (!ModelState.IsValid)
@@ -71,11 +59,11 @@ namespace community.Controllers
                 var generator = new TokenGenerator(_configuration, _userManager);
                 var token = await generator.GenerateToken(user);
                 _logger.LogInformation("User logged in.");
-                return Json(new UserViewModel(user){ Token = token, ReturnUrl = model.ReturnUrl});
+                return Json(new UserViewModel(user){ Token = token });
             }
             if (result.RequiresTwoFactor)
             {
-                return RedirectToAction(nameof(LoginWith2fa), new {model.ReturnUrl, model.RememberMe});
+                return RedirectToAction(nameof(LoginWith2fa), new {returnUrl, model.RememberMe});
             }
             if (result.IsLockedOut)
             {
@@ -104,9 +92,9 @@ namespace community.Controllers
             return View(model);
         }
 
+        // TODO [ValidateAntiForgeryToken]
         [HttpPost]
         [AllowAnonymous]
-        //TODO [ValidateAntiForgeryToken]
         public async Task<IActionResult> LoginWith2fa(LoginWith2faViewModel model, bool rememberMe, string returnUrl = null)
         {
             if (!ModelState.IsValid)
@@ -155,9 +143,9 @@ namespace community.Controllers
             return View();
         }
 
+        // TODO [ValidateAntiForgeryToken]
         [HttpPost]
         [AllowAnonymous]
-        //TODO [ValidateAntiForgeryToken]
         public async Task<IActionResult> LoginWithRecoveryCode(LoginWithRecoveryCodeViewModel model, string returnUrl = null)
         {
             if (!ModelState.IsValid)
@@ -197,21 +185,12 @@ namespace community.Controllers
             return View();
         }
 
-        //[HttpGet]
-        //[AllowAnonymous]
-        //public IActionResult Register(string returnUrl = null)
-        //{
-        //    ViewData["ReturnUrl"] = returnUrl;
-        //    return View();
-        //}
-
+        // TODO [ValidateAntiForgeryToken]
         [HttpPost]
         [AllowAnonymous]
-        //TODO [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterViewModel model)
+        public async Task<IActionResult> Register([FromBody] RegisterViewModel model, string returnUrl = null)
         {
-            ViewData["ReturnUrl"] = model.ReturnUrl;
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid) return Json(model);
 
             var user = new User
             {
@@ -230,17 +209,20 @@ namespace community.Controllers
                 await _emailSender.SendEmailConfirmationAsync(model.Email, callbackUrl);
 
                 await _signInManager.SignInAsync(user, isPersistent: false);
-                _logger.LogInformation("User created a new account with password.");
-                return RedirectToLocal(model.ReturnUrl);
+                var generator = new TokenGenerator(_configuration, _userManager);
+                var token = await generator.GenerateToken(user);
+                _logger.LogInformation("User logged in.");
+                return Json(new UserViewModel(user){ Token = token });
             }
             AddErrors(result);
 
             // If we got this far, something failed, redisplay form
-            return View(model);
+            return Json(model);
         }
 
+        // TODO [ValidateAntiForgeryToken]
         [HttpPost]
-        //TODO [ValidateAntiForgeryToken]
+        [AllowAnonymous]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
@@ -248,9 +230,9 @@ namespace community.Controllers
             return Json(true);
         }
 
+        // TODO [ValidateAntiForgeryToken]
         [HttpPost]
         [AllowAnonymous]
-        //TODO [ValidateAntiForgeryToken]
         public IActionResult ExternalLogin(string provider, string returnUrl = null)
         {
             // Request a redirect to the external login provider.
@@ -348,9 +330,9 @@ namespace community.Controllers
             return View();
         }
 
+        // TODO [ValidateAntiForgeryToken]
         [HttpPost]
         [AllowAnonymous]
-        //TODO [ValidateAntiForgeryToken]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
         {
             if (ModelState.IsValid)
@@ -394,9 +376,9 @@ namespace community.Controllers
             return View(model);
         }
 
+        // TODO [ValidateAntiForgeryToken]
         [HttpPost]
         [AllowAnonymous]
-        //TODO [ValidateAntiForgeryToken]
         public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
         {
             if (!ModelState.IsValid)

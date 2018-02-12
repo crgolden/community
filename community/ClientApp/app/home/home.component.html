@@ -1,1 +1,33 @@
-<h2>Home</h2>
+<div class="row">
+    <div class="col-sm-1 col-md-3"></div>
+    <div class="col-sm-10 col-md-6 text-center">
+        <h2>Home</h2>
+        <hr />
+    </div>
+    <div class="col-sm-1 col-md-3"></div>
+</div>
+<div class="row">
+    <div class="col-sm-1 col-md-3"></div>
+    <div class="col-sm-3 col-md-2 text-center">
+        <h4>
+            <a [routerLink]="['/Events']">
+                <i class="far fa-calendar-alt fa-5x"></i><br /><br />Events
+            </a>
+        </h4>
+    </div>
+    <div class="col-sm-4 col-md-2 text-center">
+        <h4>
+            <a [routerLink]="['/Addresses']">
+                <i class="fas fa-location-arrow fa-5x"></i><br /><br />Addresses
+            </a>
+        </h4>
+    </div>
+    <div class="col-sm-3 col-md-2 text-center">
+        <h4>
+            <a [routerLink]="['/Users']">
+                <i class="fas fa-user fa-5x"></i><br /><br />Users
+            </a>
+        </h4>
+    </div>
+    <div class="col-sm-1 col-md-3"></div>
+</div>

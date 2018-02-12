@@ -12,17 +12,21 @@ export class UsersService extends AppService {
         super();
     }
 
-    getUsers(): Observable<User[]> {
+    index(): Observable<string | User[]> {
 
         return this.http
             .get<User[]>("/users/index")
             .catch(this.handleError);
     }
 
-    details(id: string): Observable<User> {
+    details(id: string): Observable<string | User> {
         
         return this.http
-            .get<User>(`/users/details/?id=${id}`)
+            .get<User>(`/Users/Details/?id=${id}`)
             .catch(this.handleError);
+    }
+
+    isUser(user: User[] | User | string): user is User {
+        return user as User !== undefined;
     }
 }

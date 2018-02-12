@@ -5,6 +5,4 @@ export interface IRegister {
     confirmPassword: string;
     firstName: string;
     lastName: string;
-    name: string;
-    returnUrl: string;
 }

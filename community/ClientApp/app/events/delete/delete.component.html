@@ -1,7 +1,7 @@
 <div class="row">
     <div class="col-sm-1 col-md-3"></div>
     <div class="col-sm-10 col-md-6">
-        <h2>Event Details</h2>
+        <h2>Delete Event</h2>
         <hr />
     </div>
     <div class="col-sm-1 col-md-3"></div>
@@ -36,11 +36,10 @@
     <div class="col-sm-1 col-md-3"></div>
     <div class="col-sm-10 col-md-6">
         <hr />
-        <h4>
-            <a routerLink="/Events/Edit/{{event.id}}">Edit</a> |
-            <a routerLink="/Events/Delete/{{event.id}}">Delete</a> |
+        <form novalidate (ngSubmit)="delete()">
+            <input type="submit" value="Delete" class="btn btn-primary" /> |
             <a routerLink="/Events">Back to List</a>
-        </h4>
+        </form>
     </div>
     <div class="col-sm-1 col-md-3"></div>
 </div>

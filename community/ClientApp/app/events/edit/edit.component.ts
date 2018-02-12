@@ -5,13 +5,15 @@ import { EventsService } from "../events.service"
 import { Event } from "../event"
 
 @Component({
-    selector: "events-details",
-    templateUrl: "./details.component.html",
-    styleUrls: ["./details.component.css"]
+    selector: "event-edit",
+    templateUrl: "./edit.component.html",
+    styleUrls: ["./edit.component.css"]
 })
-export class DetailsComponent {
+export class EditComponent {
 
     errors: string = "";
+    isRequesting: boolean = false;
+    submitted: boolean = false;
     event = new Event();
 
     constructor(
@@ -33,6 +35,28 @@ export class DetailsComponent {
                             that.event.name = event.name;
                             that.event.details = event.details;
                             that.event.date = event.date;
+                        }
+                    },
+                    (error: string) => that.errors = error);
+        }
+    }
+
+    edit({ value, valid }: { value: Event, valid: boolean }) {
+        var that = this;
+        that.submitted = true;
+
+        if (valid) {
+            that.isRequesting = true;
+            that.event.name = value.name;
+            that.event.details = value.details;
+            that.event.date = value.date;
+            that.eventsService.edit(that.event)
+                .finally(
+                    () => that.isRequesting = false)
+                .subscribe(
+                    event => {
+                        if (event instanceof Event) {
+                            that.router.navigate([`/Events/Details/${event.id}`]);
                         }
                     },
                     (error: string) => that.errors = error);

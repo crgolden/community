@@ -8,32 +8,56 @@ import { Event } from "./event"
 @Injectable()
 export class EventsService extends AppService {
 
-    constructor(private readonly http: HttpClient) {
+    constructor(
+        private readonly http: HttpClient) {
         super();
     }
 
-    getEvents(): Observable<Event[]> {
+    index(): Observable<Event[] | string> {
 
         return this.http
             .get<Event[]>("/events/index")
             .catch(this.handleError);
     }
 
-    getEvent(id: string): Observable<Event> {
+    details(id: string): Observable<Event[] | Event | string> {
         
         return this.http
-            .get<Event>(`/events/details/?id=${id}`)
+            .get<Event>(`/Events/Details?id=${id}`)
             .catch(this.handleError);
     }
 
-    createEvent(event: Event): Observable<Event> {
+    create(event: Event): Observable<Event[] | Event | string> {
 
         const that = this,
             body = JSON.stringify(event),
-            options = { headers: that.headers };
+            options = { headers: that.getHeaders() };
         
         return that.http
-            .post<Event>("/events/create", body, options)
+            .post<Event>("/Events/Create", body, options)
             .catch(that.handleError);
+    }
+
+    edit(event: Event): Observable<Event[] | Event | string> {
+        const that = this,
+            body = JSON.stringify(event),
+            options = { headers: that.getHeaders() };
+        
+        return that.http
+            .post<Event>(`/Events/Edit?id=${event.id}`, body, options)
+            .catch(that.handleError);
+    }
+
+    delete(id: string): Observable<Event[] | boolean | string> {
+        const that = this,
+            options = { headers: that.getHeaders() };
+
+        return that.http
+            .post<boolean>(`/Events/Delete?id=${id}`, {}, options)
+            .catch(that.handleError);
+    }
+
+    isEvent(event: Event[] | Event | string): event is Event {
+        return event as Event !== undefined;
     }
 }

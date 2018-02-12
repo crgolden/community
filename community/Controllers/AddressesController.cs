@@ -2,15 +2,14 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using community.Data;
+using community.Extensions;
 using community.Models;
 using Microsoft.AspNetCore.Authorization;
 
 namespace community.Controllers
 {
-    [Authorize]
     [Route("[controller]/[action]")]
     public class AddressesController : Controller
     {
@@ -21,15 +20,11 @@ namespace community.Controllers
             _context = context;
         }
 
-        // GET: Addresses
-        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            return Json(await _context.Addresses.Select(x => new AddressViewModel(x)).ToArrayAsync());
+            return Json(await _context.Addresses.OrderBy(x => x.Street).Select(x => new AddressViewModel(x)).ToArrayAsync());
         }
 
-        // GET: Addresses/Details/5
-        [AllowAnonymous]
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null)
@@ -44,111 +39,80 @@ namespace community.Controllers
             return Json(address);
         }
 
-        //// GET: Addresses/Create
-        //public IActionResult Create()
-        //{
-        //    ViewData["UserId"] = new SelectList(_context.User, "Id", "Id");
-        //    return View();
-        //}
-
-        // POST: Addresses/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // TODO [ValidateAntiForgeryToken]
         [HttpPost]
-        [AllowAnonymous]
-        //TODO [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([FromBody, Bind("Id,Street,Street2,City,State,ZipCode,Latitude,Longitude,Home,UserId")] Address address)
+        [Authorize(Policy = "User")]
+        public async Task<IActionResult> Create([FromBody, Bind("Id,Street,Street2,City,State,ZipCode,Latitude,Longitude,Home,UserId")] AddressViewModel model)
         {
-            if (!ModelState.IsValid) return Json(address);
+            if (!ModelState.IsValid) return Json(model);
+            var address = await model.ExisitingMatch(_context);
+            if (address != null)
+            {
+                model.Id = address.Id;
+            }
+            else
+            {
+                address = new Address
+                {
+                    Id = Guid.NewGuid(),
+                    Street = model.Street,
+                    Street2 = model.Street2,
+                    City = model.City,
+                    State = model.State,
+                    ZipCode = model.ZipCode,
+                    UserId = model.UserId
+                };
+                await _context.Addresses.AddAsync(address);
 
-            address.Id = Guid.NewGuid();
-            _context.Add(address);
-            await _context.SaveChangesAsync();
+                if (await _context.SaveChangesAsync() <= 0) return Json(model);
 
-            return Json(new AddressViewModel(address));
+                model.Id = address.Id;
+            }
+            return Json(model);
         }
 
-        // GET: Addresses/Edit/5
-        public async Task<IActionResult> Edit(Guid? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var address = await _context.Addresses.SingleOrDefaultAsync(m => m.Id == id);
-            if (address == null)
-            {
-                return NotFound();
-            }
-            ViewData["UserId"] = new SelectList(_context.User, "Id", "Id", address.UserId);
-            return View(address);
-        }
-
-        // POST: Addresses/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // TODO [ValidateAntiForgeryToken]
         [HttpPost]
-        //TODO [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Street,Street2,City,State,ZipCode,Latitude,Longitude,Home,UserId")] Address address)
+        [Authorize(Policy = "User")]
+        public async Task<IActionResult> Edit(Guid id, [FromBody, Bind("Id,Street,Street2,City,State,ZipCode,Latitude,Longitude,Home,UserId")] AddressViewModel model)
         {
-            if (id != address.Id)
+            if (id != model.Id)
             {
                 return NotFound();
             }
+            if (!ModelState.IsValid) return Json(model);
 
-            if (ModelState.IsValid)
+            try
             {
-                try
-                {
-                    _context.Update(address);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!AddressExists(address.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                var address = await _context.Addresses.FindAsync(model.Id);
+
+                address.Street = model.Street;
+                address.Street2 = model.Street2;
+                address.City = model.City;
+                address.State = model.State;
+                address.ZipCode = model.ZipCode;
+
+                _context.Update(address);
+                await _context.SaveChangesAsync();
             }
-            ViewData["UserId"] = new SelectList(_context.User, "Id", "Id", address.UserId);
-            return View(address);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!AddressExists(model.Id)) return NotFound();
+
+                throw;
+            }
+            return Json(model);
         }
 
-        // GET: Addresses/Delete/5
-        public async Task<IActionResult> Delete(Guid? id)
+        // TODO [ValidateAntiForgeryToken]
+        [HttpPost]
+        [Authorize(Policy = "User")]
+        public async Task<IActionResult> Delete(Guid id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var address = await _context.Addresses
-                .Include(a => a.User)
-                .SingleOrDefaultAsync(m => m.Id == id);
-            if (address == null)
-            {
-                return NotFound();
-            }
-
-            return View(address);
-        }
-
-        // POST: Addresses/Delete/5
-        [HttpPost, ActionName("Delete")]
-        //TODO [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(Guid id)
-        {
-            var address = await _context.Addresses.SingleOrDefaultAsync(m => m.Id == id);
+            var address = await _context.Addresses.FindAsync(id);
             _context.Addresses.Remove(address);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return Json(true);
         }
 
         private bool AddressExists(Guid id)

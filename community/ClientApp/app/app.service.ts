@@ -1,4 +1,4 @@
-﻿import { Injectable } from "@angular/core"
+﻿import { Injectable, Output, EventEmitter } from "@angular/core"
 import { HttpHeaders } from "@angular/common/http";
 import { Observable } from "rxjs/Rx";
 
@@ -7,18 +7,9 @@ import { User } from "./users/user"
 @Injectable()
 export class AppService {
 
-    readonly user: User;
-    readonly headers: HttpHeaders;
+    @Output() isLoggedIn = new EventEmitter<boolean>();
 
-    constructor() {
-        this.user = this.getUser();
-        this.headers = new HttpHeaders({
-            'Content-Type': "application/json",
-            'Authorization': `Bearer ${this.user.token}`
-        });
-    }
-
-    protected handleError(error: any) {
+    protected handleError(error: any): Observable<string> {
         const applicationError = error.headers.get("Application-Error");
 
         if (applicationError) {
@@ -37,19 +28,27 @@ export class AppService {
         return Observable.throw(modelStateErrors || "Server error");
     }
 
-    protected setUser(user: User) {
+    protected setUser(user: User): void {
         if (typeof window !== "undefined") {
             localStorage.setItem("user", JSON.stringify(user));
         }
     }
 
-    protected removeUser() {
+    protected setExpiration(time: Date): void {
         if (typeof window !== "undefined") {
-            localStorage.removeItem("user");
+            const expiration = time.getTime() + 30 * 60000;
+            localStorage.setItem("expiration", JSON.stringify(expiration));
         }
     }
 
-    private getUser(): User {
+    protected getHeaders(): HttpHeaders {
+        return new HttpHeaders({
+            'Content-Type': "application/json",
+            'Authorization': `Bearer ${this.getUser().token}`
+        });
+    }
+
+    getUser(): User {
         const user = new User();
         if (typeof window !== "undefined") {
             const userString = localStorage.getItem("user");
@@ -66,5 +65,39 @@ export class AppService {
             }
         }
         return user;
+    }
+
+    getExpiration(): Date {
+        const expiration = new Date();
+        if (typeof window !== "undefined") {
+            const expirationString = localStorage.getItem("expiration");
+            let expirationNumber = 0;
+            if (expirationString != null) {
+                expirationNumber = parseFloat(expirationString);
+            }
+            if (expirationNumber > 0) {
+                expiration.setTime(expirationNumber);
+            }
+        }
+        return expiration;
+    }
+
+    hasToken(): boolean {
+        const token = this.getUser().token,
+            expired = this.getExpiration().getTime() < Date.now();
+
+        return (typeof token == "string" && token.length > 0 && !expired);
+    }
+
+    protected removeUser(): void {
+        if (typeof window !== "undefined") {
+            localStorage.removeItem("user");
+        }
+    }
+
+    protected removeExpiration(): void {
+        if (typeof window !== "undefined") {
+            localStorage.removeItem("expiration");
+        }
     }
 }

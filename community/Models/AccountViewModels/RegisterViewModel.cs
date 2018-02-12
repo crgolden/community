@@ -2,7 +2,7 @@
 
 namespace community.Models.AccountViewModels
 {
-    // TypeScript: register.ts
+    // TypeScript: register.interface.ts
     public class RegisterViewModel
     {
         [Required]
@@ -23,7 +23,5 @@ namespace community.Models.AccountViewModels
 
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string Name => $"{FirstName} {LastName}";
-        public string ReturnUrl {get; set; }
     }
 }

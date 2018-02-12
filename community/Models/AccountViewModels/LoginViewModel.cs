@@ -2,7 +2,7 @@
 
 namespace community.Models.AccountViewModels
 {
-    // TypeScript: login.ts
+    // TypeScript: login.interface.ts
     public class LoginViewModel
     {
         [Required]
@@ -15,7 +15,5 @@ namespace community.Models.AccountViewModels
 
         [Display(Name = "Remember me?")]
         public bool RememberMe { get; set; }
-
-        public string ReturnUrl { get; set; }
     }
 }

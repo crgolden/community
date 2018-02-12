@@ -1,5 +1,5 @@
 ﻿import { Injectable } from "@angular/core";
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs/Rx";
 
 import { AppService } from "../app.service";
@@ -12,30 +12,51 @@ export class AddressesService extends AppService {
         super();
     }
 
-    getAddresses(): Observable<Address[]> {
+    index(): Observable<Address[] | string> {
 
         return this.http
-            .get<Address[]>("/addresses/index")
+            .get<Address[]>("/Addresses/Index")
             .catch(this.handleError);
     }
 
-    getAddress(id: string): Observable<Address> {
+    details(id: string): Observable<Address[] | Address | string> {
         
         return this.http
-            .get<Address>(`/addresses/details/?id=${id}`)
+            .get<Address>(`/Addresses/Details/?id=${id}`)
             .catch(this.handleError);
     }
 
-    createAddress(address: Address): Observable<Address> {
+    create(address: Address): Observable<Address[] | Address | string> {
 
         const that = this,
             body = JSON.stringify(address),
-            httpOptions = {
-                headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-            }
+            options = { headers: that.getHeaders() };
 
         return that.http
-            .post<Address>("/addresses/create", body, httpOptions)
+            .post<Address>("/Addresses/Create", body, options)
             .catch(that.handleError);
+    }
+
+    edit(address: Address): Observable<Address[] | Address | string> {
+        const that = this,
+            body = JSON.stringify(address),
+            options = { headers: that.getHeaders() };
+
+        return that.http
+            .post<Address>(`/Addresses/Edit?id=${address.id}`, body, options)
+            .catch(that.handleError);
+    }
+
+    delete(id: string): Observable<Address[] | boolean | string> {
+        const that = this,
+            options = { headers: that.getHeaders() };
+
+        return that.http
+            .post<boolean>(`/Addresses/Delete?id=${id}`, {}, options)
+            .catch(that.handleError);
+    }
+
+    isAddress(address: Address[] | Address | string): address is Address {
+        return address as Address !== undefined;
     }
 }

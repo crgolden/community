@@ -12,22 +12,23 @@ import { Event } from "../event"
 export class IndexComponent {
 
     errors: string = "";
-    isRequesting: boolean = false;
-    submitted: boolean = false;
-    events: Event[];
+    events = new Array<Event>();
 
-    constructor(private readonly eventsService: EventsService, private readonly router: Router) { }
-
-    ngOnInit(): void {
-
-        var that = this;
-        
-        that.eventsService
-            .getEvents()
-            .subscribe(events => {
-                    that.events = events;
-                },
-                error => that.errors = error);
+    constructor(
+        private readonly eventsService: EventsService,
+        private readonly router: Router) {
     }
 
+    ngOnInit(): void {
+        var that = this;
+
+        that.eventsService.index()
+            .subscribe(
+                (events: Event[] | string) => {
+                    if (events instanceof Array) {
+                        that.events = events;
+                    }
+                },
+                (error: string) => that.errors = error);
+    }
 }
