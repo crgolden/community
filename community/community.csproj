@@ -47,8 +47,6 @@
   <ItemGroup>
     <TypeScriptCompile Include="ClientApp\app\account\account.module.ts" />
     <TypeScriptCompile Include="ClientApp\app\account\account.service.ts" />
-    <TypeScriptCompile Include="ClientApp\app\account\login\login.ts" />
-    <TypeScriptCompile Include="ClientApp\app\account\register\register.ts" />
     <TypeScriptCompile Include="ClientApp\app\app.service.ts" />
     <TypeScriptCompile Include="ClientApp\app\addresses\address.ts" />
     <TypeScriptCompile Include="ClientApp\app\addresses\addresses.module.ts" />
