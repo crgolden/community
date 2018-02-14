@@ -19,7 +19,7 @@ export class UsersService extends AppService {
             .catch(this.handleError);
     }
 
-    details(id: string): Observable<string | User> {
+    details(id: string): Observable<User[] | User | string> {
         
         return this.http
             .get<User>(`/Users/Details/?id=${id}`)
