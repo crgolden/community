@@ -1,7 +1,6 @@
-import { Component } from "@angular/core";
-import { Router } from "@angular/router";
+import { Component, OnInit } from "@angular/core";
+import { ActivatedRoute } from "@angular/router";
 
-import { AddressesService } from "../addresses.service"
 import { Address } from "../address"
 
 @Component({
@@ -9,26 +8,14 @@ import { Address } from "../address"
     templateUrl: "./index.component.html",
     styleUrls: ["./index.component.css"]
 })
-export class IndexComponent {
+export class IndexComponent implements OnInit {
 
-    errors: string = "";
-    addresses = new Array<Address>();
+    addresses: Address[] = [];
 
-    constructor(
-        private readonly addressesService: AddressesService,
-        private readonly router: Router) {
+    constructor(private readonly route: ActivatedRoute) {
     }
 
     ngOnInit(): void {
-        var that = this;
-
-        that.addressesService.index()
-            .subscribe(
-                (addresses: Address[] | string) => {
-                    if (addresses instanceof Array) {
-                        that.addresses = addresses;
-                    }
-                },
-                (error: string) => that.errors = error);
+        this.addresses = this.route.snapshot.data["addresses"];
     }
 }

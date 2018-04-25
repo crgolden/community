@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { Router, ActivatedRoute } from "@angular/router";
 
 import { EventsService } from "../events.service"
@@ -9,7 +9,7 @@ import { Event } from "../event"
     templateUrl: "./edit.component.html",
     styleUrls: ["./edit.component.css"]
 })
-export class EditComponent {
+export class EditComponent implements OnInit {
 
     errors: string = "";
     isRequesting: boolean = false;
@@ -23,43 +23,20 @@ export class EditComponent {
     }
 
     ngOnInit(): void {
-        var that = this;
-        const id = that.route.snapshot.paramMap.get("id");
-
-        if (typeof id == "string" && id.length === 36) {
-            that.eventsService.details(id)
-                .subscribe(
-                    (event: Event[] | Event | string) => {
-                        if (that.eventsService.isEvent(event)) {
-                            that.event.id = event.id;
-                            that.event.name = event.name;
-                            that.event.details = event.details;
-                            that.event.date = event.date;
-                        }
-                    },
-                    (error: string) => that.errors = error);
-        }
+        this.event = this.route.snapshot.data["event"];
     }
 
-    edit({ value, valid }: { value: Event, valid: boolean }) {
-        var that = this;
-        that.submitted = true;
+    edit(valid: boolean) {
+        this.submitted = true;
 
         if (valid) {
-            that.isRequesting = true;
-            that.event.name = value.name;
-            that.event.details = value.details;
-            that.event.date = value.date;
-            that.eventsService.edit(that.event)
-                .finally(
-                    () => that.isRequesting = false)
+            this.isRequesting = true;
+            this.eventsService
+                .edit(this.event)
+                .finally(() => this.isRequesting = false)
                 .subscribe(
-                    event => {
-                        if (event instanceof Event) {
-                            that.router.navigate([`/Events/Details/${event.id}`]);
-                        }
-                    },
-                    (error: string) => that.errors = error);
+                () => this.router.navigate([`/Events/Details/${this.event.id}`]),
+                (error: string) => this.errors = error);
         }
     }
 }

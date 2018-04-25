@@ -15,18 +15,14 @@ export class UsersService extends AppService {
     index(): Observable<string | User[]> {
 
         return this.http
-            .get<User[]>("/users/index")
+            .get<User[]>("/Users/Index")
             .catch(this.handleError);
     }
 
-    details(id: string): Observable<User[] | User | string> {
+    details(id: string | null): Observable<string | User> {
         
         return this.http
             .get<User>(`/Users/Details/?id=${id}`)
             .catch(this.handleError);
-    }
-
-    isUser(user: User[] | User | string): user is User {
-        return user as User !== undefined;
     }
 }

@@ -14,30 +14,25 @@ export class CreateComponent {
     errors: string = "";
     isRequesting: boolean = false;
     submitted: boolean = false;
-    value = new Address();
+    address = new Address();
 
     constructor(
         private readonly addressesService: AddressesService,
         private readonly router: Router) {
+        this.address.userId = this.addressesService.getUser().id;
     }
 
-    create({ value, valid }: { value: Address, valid: boolean }) {
-        var that = this;
-        that.submitted = true;
+    create(valid: boolean) {
+        this.submitted = true;
 
         if (valid) {
-            that.isRequesting = true;
-            value.userId = that.addressesService.getUser().id;
-            that.addressesService.create(value)
-                .finally(
-                    () => that.isRequesting = false)
+            this.isRequesting = true;
+            this.addressesService
+                .create(this.address)
+                .finally(() => this.isRequesting = false)
                 .subscribe(
-                    (address: Address[] | Address | string) => {
-                        if (that.addressesService.isAddress(address)) {
-                            that.router.navigate([`/Addresses/Details/${address.id}`]);
-                        }
-                    },
-                    (error: string) => that.errors = error);
+                (id: string) => this.router.navigate([`/Addresses/Details/${id}`]),
+                (error: string) => this.errors = error);
         }
     }
 }

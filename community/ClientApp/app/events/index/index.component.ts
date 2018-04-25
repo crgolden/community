@@ -1,7 +1,6 @@
-import { Component } from "@angular/core";
-import { Router } from "@angular/router";
+import { Component, OnInit } from "@angular/core";
+import { ActivatedRoute } from "@angular/router";
 
-import { EventsService } from "../events.service"
 import { Event } from "../event"
 
 @Component({
@@ -9,26 +8,14 @@ import { Event } from "../event"
     templateUrl: "./index.component.html",
     styleUrls: ["./index.component.css"]
 })
-export class IndexComponent {
+export class IndexComponent implements OnInit {
 
-    errors: string = "";
-    events = new Array<Event>();
+    events: Event[] = [];
 
-    constructor(
-        private readonly eventsService: EventsService,
-        private readonly router: Router) {
+    constructor(private readonly route: ActivatedRoute) {
     }
 
     ngOnInit(): void {
-        var that = this;
-
-        that.eventsService.index()
-            .subscribe(
-                (events: Event[] | string) => {
-                    if (events instanceof Array) {
-                        that.events = events;
-                    }
-                },
-                (error: string) => that.errors = error);
+        this.events = this.route.snapshot.data["events"];
     }
 }

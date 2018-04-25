@@ -15,6 +15,9 @@ namespace community.Controllers
     {
         private readonly ApplicationDbContext _context;
 
+        private const string CreateBind = "Id,Name,Details,Date,UserId,AddressId,Street,Street2,City,State,ZipCode",
+            EditBind = "Id,Name,Details,Date,UserId,AddressId";
+
         public EventsController(ApplicationDbContext context)
         {
             _context = context;
@@ -22,16 +25,19 @@ namespace community.Controllers
 
         public async Task<IActionResult> Index()
         {
-            return Json(await _context.Events.OrderBy(x => x.Name).Select(x => new EventViewModel(x)).ToArrayAsync());
+            return Json(await _context.Events
+                .OrderBy(x => x.Name).Select(x => new EventViewModel(x)).ToArrayAsync());
         }
 
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null)
             {
-                return NotFound();
+                return BadRequest();
             }
-            var @event = await _context.Events.Select(x => new EventViewModel(x)).SingleOrDefaultAsync(m => m.Id == id);
+            var @event = await _context.Events
+                .Select(x => new EventViewModel(x)).SingleOrDefaultAsync(m => m.Id == id.Value);
+
             if (@event == null)
             {
                 return NotFound();
@@ -42,10 +48,12 @@ namespace community.Controllers
         // TODO [ValidateAntiForgeryToken]
         [HttpPost]
         [Authorize(Policy = "User")]
-        public async Task<IActionResult> Create([FromBody, Bind("Id,Name,Details,Date,UserId,AddressId,Street,Street2,City,State,ZipCode")] EventViewModel model)
+        public async Task<IActionResult> Create([FromBody] [Bind(CreateBind)] EventViewModel model)
         {
-            if (!ModelState.IsValid) return Json(model);
-
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var address = await model.ExisitingMatch(_context);
             if (address == null)
             {
@@ -58,7 +66,7 @@ namespace community.Controllers
                     ZipCode = model.ZipCode,
                     UserId = model.UserId
                 };
-                await _context.Addresses.AddAsync(address);
+                _context.Addresses.Add(address);
             }
             var @event = new Event
             {
@@ -69,29 +77,24 @@ namespace community.Controllers
                 UserId = model.UserId,
                 Address = address
             };
-            await _context.Events.AddAsync(@event);
+            _context.Events.Add(@event);
 
-            if (await _context.SaveChangesAsync() <= 0) return Json(model);
-
-            model.Id = @event.Id;
-            model.AddressId = @event.AddressId;
-            return Json(model);
+            await _context.SaveChangesAsync();
+            return Json(@event.Id);
         }
 
         // TODO [ValidateAntiForgeryToken]
-        [HttpPost]
+        [HttpPut]
         [Authorize(Policy = "User")]
-        public async Task<IActionResult> Edit(Guid id, [FromBody, Bind("Id,Name,Details,Date,UserId,AddressId")] EventViewModel model)
+        public async Task<IActionResult> Edit(Guid? id, [FromBody] [Bind(EditBind)] EventViewModel model)
         {
-            if (id != model.Id)
+            if (id == null || id.Value != model.Id || !ModelState.IsValid)
             {
-                return NotFound();
+                return BadRequest(ModelState);
             }
-            if (!ModelState.IsValid) return Json(model);
-
             try
             {
-                var @event = await _context.Events.FindAsync(model.Id);
+                var @event = await _context.Events.FindAsync(id.Value);
 
                 @event.AddressId = model.AddressId;
                 @event.Date = model.Date;
@@ -103,27 +106,34 @@ namespace community.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!EventExists(model.Id)) return NotFound();
-
+                if (!await _context.Events.AnyAsync(x => x.Id == id.Value))
+                {
+                    return NotFound();
+                }
                 throw;
             }
-            return Json(model);
+
+            return NoContent();
         }
 
         // TODO [ValidateAntiForgeryToken]
-        [HttpPost]
+        [HttpDelete]
         [Authorize(Policy = "User")]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid? id)
         {
-            var @event = await _context.Events.FindAsync(id);
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            var @event = await _context.Events.FindAsync(id.Value);
+            if (@event == null)
+            {
+                return NotFound();
+            }
             _context.Events.Remove(@event);
-            await _context.SaveChangesAsync();
-            return Json(true);
-        }
 
-        private bool EventExists(Guid id)
-        {
-            return _context.Events.Any(e => e.Id == id);
+            await _context.SaveChangesAsync();
+            return Ok();
         }
     }
 }

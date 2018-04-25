@@ -7,14 +7,24 @@ import { IndexComponent } from "./index/index.component"
 import { DetailsComponent } from "./details/details.component"
 
 import { UsersService } from "./users.service"
+import { IndexResolver } from "./index/index.resolver"
+import { DetailsResolver } from "./details/details.resolver"
 
 @NgModule({
     imports: [
         CommonModule,
         HttpClientModule,
         RouterModule.forChild([
-            { path: "Users", component: IndexComponent },
-            { path: "Users/Details/:id", component: DetailsComponent }
+            {
+                path: "Users",
+                component: IndexComponent,
+                resolve: { users: IndexResolver }
+            },
+            {
+                path: "Users/Details/:id",
+                component: DetailsComponent,
+                resolve: { user: DetailsResolver }
+            }
         ])
     ],
     declarations: [
@@ -22,7 +32,9 @@ import { UsersService } from "./users.service"
         DetailsComponent
     ],
     providers: [
-        UsersService
+        UsersService,
+        IndexResolver,
+        DetailsResolver
     ]
 })
 export class UsersModule {

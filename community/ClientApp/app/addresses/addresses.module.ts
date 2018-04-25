@@ -12,6 +12,8 @@ import { DeleteComponent } from "./delete/delete.component"
 
 import { AddressesService } from "./addresses.service"
 import { AppCanActivate } from "../app.can-activate"
+import { IndexResolver } from "./index/index.resolver"
+import { DetailsResolver } from "./details/details.resolver"
 
 @NgModule({
     imports: [
@@ -19,11 +21,33 @@ import { AppCanActivate } from "../app.can-activate"
         FormsModule,
         HttpClientModule,
         RouterModule.forChild([
-            { path: "Addresses", component: IndexComponent },
-            { path: "Addresses/Details/:id", component: DetailsComponent },
-            { path: "Addresses/Create", component: CreateComponent, canActivate: [AppCanActivate] },
-            { path: "Addresses/Edit/:id", component: EditComponent, canActivate: [AppCanActivate] },
-            { path: "Addresses/Delete/:id", component: DeleteComponent, canActivate: [AppCanActivate] }
+            {
+                path: "Addresses",
+                component: IndexComponent,
+                resolve: { addresses: IndexResolver }
+            },
+            {
+                path: "Addresses/Details/:id",
+                component: DetailsComponent,
+                resolve: { address: DetailsResolver }
+            },
+            {
+                path: "Addresses/Create",
+                component: CreateComponent,
+                canActivate: [AppCanActivate]
+            },
+            {
+                path: "Addresses/Edit/:id",
+                component: EditComponent,
+                resolve: { address: DetailsResolver },
+                canActivate: [AppCanActivate]
+            },
+            {
+                path: "Addresses/Delete/:id",
+                component: DeleteComponent,
+                resolve: { address: DetailsResolver },
+                canActivate: [AppCanActivate]
+            }
         ])
     ],
     declarations: [
@@ -35,7 +59,9 @@ import { AppCanActivate } from "../app.can-activate"
     ],
     providers: [
         AddressesService,
-        AppCanActivate
+        AppCanActivate,
+        IndexResolver,
+        DetailsResolver
     ]
 })
 export class AddressesModule {

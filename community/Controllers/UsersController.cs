@@ -19,16 +19,19 @@ namespace community.Controllers
 
         public async Task<IActionResult> Index()
         {
-            return Json(await _context.User.OrderBy(x => x.FirstName).Select(x => new UserViewModel(x)).ToArrayAsync());
+            return Json(await _context.User
+                .OrderBy(x => x.FirstName).Select(x => new UserViewModel(x)).ToArrayAsync());
         }
 
         public async Task<IActionResult> Details(string id)
         {
             if (id == null)
             {
-                return NotFound();
+                return BadRequest();
             }
-            var user = await _context.User.Select(x => new UserViewModel(x)).SingleOrDefaultAsync(m => m.Id == id);
+            var user = await _context.User
+                .Select(x => new UserViewModel(x)).SingleOrDefaultAsync(m => m.Id == id);
+
             if (user == null)
             {
                 return NotFound();

@@ -12,51 +12,44 @@ export class AddressesService extends AppService {
         super();
     }
 
-    index(): Observable<Address[] | string> {
+    index(): Observable<string |Address[]> {
 
         return this.http
             .get<Address[]>("/Addresses/Index")
             .catch(this.handleError);
     }
 
-    details(id: string): Observable<Address[] | Address | string> {
+    details(id: string | null): Observable<string | Address> {
         
         return this.http
             .get<Address>(`/Addresses/Details/?id=${id}`)
             .catch(this.handleError);
     }
 
-    create(address: Address): Observable<Address[] | Address | string> {
+    create(address: Address): Observable<string> {
 
-        const that = this,
-            body = JSON.stringify(address),
-            options = { headers: that.getHeaders() };
+        const body = JSON.stringify(address),
+            options = { headers: this.getHeaders() };
 
-        return that.http
-            .post<Address>("/Addresses/Create", body, options)
-            .catch(that.handleError);
+        return this.http
+            .post<string>("/Addresses/Create", body, options)
+            .catch(this.handleError);
     }
 
-    edit(address: Address): Observable<Address[] | Address | string> {
-        const that = this,
-            body = JSON.stringify(address),
-            options = { headers: that.getHeaders() };
+    edit(address: Address) {
+        const body = JSON.stringify(address),
+            options = { headers: this.getHeaders() };
 
-        return that.http
-            .post<Address>(`/Addresses/Edit?id=${address.id}`, body, options)
-            .catch(that.handleError);
+        return this.http
+            .put(`/Addresses/Edit?id=${address.id}`, body, options)
+            .catch(this.handleError);
     }
 
-    delete(id: string): Observable<Address[] | boolean | string> {
-        const that = this,
-            options = { headers: that.getHeaders() };
+    delete(id: string | undefined) {
+        const options = { headers: this.getHeaders() };
 
-        return that.http
-            .post<boolean>(`/Addresses/Delete?id=${id}`, {}, options)
-            .catch(that.handleError);
-    }
-
-    isAddress(address: Address[] | Address | string): address is Address {
-        return address as Address !== undefined;
+        return this.http
+            .delete(`/Addresses/Delete?id=${id}`, options)
+            .catch(this.handleError);
     }
 }

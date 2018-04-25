@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { Router, ActivatedRoute } from "@angular/router";
 
 import { AddressesService } from "../addresses.service"
@@ -9,7 +9,7 @@ import { Address } from "../address"
     templateUrl: "./delete.component.html",
     styleUrls: ["./delete.component.css"]
 })
-export class DeleteComponent {
+export class DeleteComponent implements OnInit {
 
     errors: string = "";
     address = new Address();
@@ -21,38 +21,14 @@ export class DeleteComponent {
     }
 
     ngOnInit(): void {
-        var that = this;
-        const id = this.route.snapshot.paramMap.get("id");
-
-        if (typeof id == "string" && id.length === 36) {
-            that.addressesService.details(id)
-                .subscribe(
-                    (address: Address[] | Address | string) => {
-                        if (that.addressesService.isAddress(address)) {
-                            that.address.id = address.id;
-                            that.address.street = address.street;
-                            that.address.street2 = address.street2;
-                            that.address.city = address.city;
-                            that.address.state = address.state;
-                            that.address.zipCode = address.zipCode;
-                        }
-                    },
-                    (error: string) => that.errors = error);
-        }
+        this.address = this.route.snapshot.data["address"];
     }
 
     delete() {
-        var that = this;
-
-        if (typeof that.address.id == "string" && that.address.id.length === 36) {
-            that.addressesService.delete(that.address.id)
-                .subscribe(
-                    res => {
-                        if (typeof res == "boolean" && res) {
-                            that.router.navigate(["/Addresses"]);
-                        }
-                    },
-                    (error: string) => that.errors = error);
-        }
+        this.addressesService
+            .delete(this.address.id)
+            .subscribe(
+            () => this.router.navigate(["/Addresses"]),
+            (error: string) => this.errors = error);
     }
 }

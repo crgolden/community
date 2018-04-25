@@ -15,6 +15,9 @@ namespace community.Controllers
     {
         private readonly ApplicationDbContext _context;
 
+        private const string CreateBind = "Id,Street,Street2,City,State,ZipCode,Latitude,Longitude,Home,UserId",
+            EditBind = "Id,Street,Street2,City,State,ZipCode,Latitude,Longitude,Home,UserId";
+
         public AddressesController(ApplicationDbContext context)
         {
             _context = context;
@@ -22,16 +25,19 @@ namespace community.Controllers
 
         public async Task<IActionResult> Index()
         {
-            return Json(await _context.Addresses.OrderBy(x => x.Street).Select(x => new AddressViewModel(x)).ToArrayAsync());
+            return Json(await _context.Addresses
+                .OrderBy(x => x.Street).Select(x => new AddressViewModel(x)).ToArrayAsync());
         }
 
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null)
             {
-                return NotFound();
+                return BadRequest();
             }
-            var address = await _context.Addresses.Select(x => new AddressViewModel(x)).SingleOrDefaultAsync(m => m.Id == id);
+            var address = await _context.Addresses
+                .Select(x => new AddressViewModel(x)).SingleOrDefaultAsync(m => m.Id == id);
+
             if (address == null)
             {
                 return NotFound();
@@ -42,49 +48,45 @@ namespace community.Controllers
         // TODO [ValidateAntiForgeryToken]
         [HttpPost]
         [Authorize(Policy = "User")]
-        public async Task<IActionResult> Create([FromBody, Bind("Id,Street,Street2,City,State,ZipCode,Latitude,Longitude,Home,UserId")] AddressViewModel model)
+        public async Task<IActionResult> Create([FromBody] [Bind(CreateBind)] AddressViewModel model)
         {
-            if (!ModelState.IsValid) return Json(model);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var address = await model.ExisitingMatch(_context);
             if (address != null)
             {
-                model.Id = address.Id;
+                return Json(address.Id);
             }
-            else
+            address = new Address
             {
-                address = new Address
-                {
-                    Id = Guid.NewGuid(),
-                    Street = model.Street,
-                    Street2 = model.Street2,
-                    City = model.City,
-                    State = model.State,
-                    ZipCode = model.ZipCode,
-                    UserId = model.UserId
-                };
-                await _context.Addresses.AddAsync(address);
+                Id = Guid.NewGuid(),
+                Street = model.Street,
+                Street2 = model.Street2,
+                City = model.City,
+                State = model.State,
+                ZipCode = model.ZipCode,
+                UserId = model.UserId
+            };
+            _context.Addresses.Add(address);
 
-                if (await _context.SaveChangesAsync() <= 0) return Json(model);
-
-                model.Id = address.Id;
-            }
-            return Json(model);
+            await _context.SaveChangesAsync();
+            return Json(address.Id);
         }
 
         // TODO [ValidateAntiForgeryToken]
-        [HttpPost]
+        [HttpPut]
         [Authorize(Policy = "User")]
-        public async Task<IActionResult> Edit(Guid id, [FromBody, Bind("Id,Street,Street2,City,State,ZipCode,Latitude,Longitude,Home,UserId")] AddressViewModel model)
+        public async Task<IActionResult> Edit(Guid? id, [FromBody] [Bind(EditBind)] AddressViewModel model)
         {
-            if (id != model.Id)
+            if (id == null || id.Value != model.Id || !ModelState.IsValid)
             {
-                return NotFound();
+                return BadRequest(ModelState);
             }
-            if (!ModelState.IsValid) return Json(model);
-
             try
             {
-                var address = await _context.Addresses.FindAsync(model.Id);
+                var address = await _context.Addresses.FindAsync(id.Value);
 
                 address.Street = model.Street;
                 address.Street2 = model.Street2;
@@ -97,27 +99,34 @@ namespace community.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!AddressExists(model.Id)) return NotFound();
-
+                if (!await _context.Addresses.AnyAsync(x => x.Id == id))
+                {
+                    return NotFound();
+                }
                 throw;
             }
-            return Json(model);
+
+            return NoContent();
         }
 
         // TODO [ValidateAntiForgeryToken]
-        [HttpPost]
+        [HttpDelete]
         [Authorize(Policy = "User")]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid? id)
         {
-            var address = await _context.Addresses.FindAsync(id);
+            if (id == null)
+            {
+                return BadRequest();
+            }
+            var address = await _context.Addresses.FindAsync(id.Value);
+            if (address == null)
+            {
+                return NotFound();
+            }
             _context.Addresses.Remove(address);
-            await _context.SaveChangesAsync();
-            return Json(true);
-        }
 
-        private bool AddressExists(Guid id)
-        {
-            return _context.Addresses.Any(e => e.Id == id);
+            await _context.SaveChangesAsync();
+            return Ok();
         }
     }
 }

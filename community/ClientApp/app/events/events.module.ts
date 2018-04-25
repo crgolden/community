@@ -12,6 +12,8 @@ import { DeleteComponent } from "./delete/delete.component"
 
 import { EventsService } from "./events.service"
 import { AppCanActivate } from "../app.can-activate"
+import { IndexResolver } from "./index/index.resolver"
+import { DetailsResolver } from "./details/details.resolver"
 
 @NgModule({
     imports: [
@@ -19,11 +21,33 @@ import { AppCanActivate } from "../app.can-activate"
         FormsModule,
         HttpClientModule,
         RouterModule.forChild([
-            { path: "Events", component: IndexComponent },
-            { path: "Events/Details/:id", component: DetailsComponent },
-            { path: "Events/Create", component: CreateComponent, canActivate: [AppCanActivate] },
-            { path: "Events/Edit/:id", component: EditComponent, canActivate: [AppCanActivate] },
-            { path: "Events/Delete/:id", component: DeleteComponent, canActivate: [AppCanActivate] }
+            {
+                path: "Events",
+                component: IndexComponent,
+                resolve: { events: IndexResolver }
+            },
+            {
+                path: "Events/Details/:id",
+                component: DetailsComponent,
+                resolve: { event: DetailsResolver }
+            },
+            {
+                path: "Events/Create",
+                component: CreateComponent,
+                canActivate: [AppCanActivate]
+            },
+            {
+                path: "Events/Edit/:id",
+                component: EditComponent,
+                resolve: { event: DetailsResolver },
+                canActivate: [AppCanActivate]
+            },
+            {
+                path: "Events/Delete/:id",
+                component: DeleteComponent,
+                resolve: { event: DetailsResolver },
+                canActivate: [AppCanActivate]
+            }
         ])
     ],
     declarations: [
@@ -35,7 +59,9 @@ import { AppCanActivate } from "../app.can-activate"
     ],
     providers: [
         EventsService,
-        AppCanActivate
+        AppCanActivate,
+        IndexResolver,
+        DetailsResolver
     ]
 })
 export class EventsModule {

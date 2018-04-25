@@ -15,20 +15,14 @@ export class NavMenuComponent {
         private readonly router: Router,
         private readonly accountService: AccountService) {
         this.isLoggedIn = accountService.hasToken();
-        accountService.isLoggedIn
-            .subscribe(
-                (res: boolean) => this.isLoggedIn = res);
+        accountService
+            .isLoggedIn
+            .subscribe((res: boolean) => this.isLoggedIn = res);
     }
 
     logout(): void {
-        var that = this;
-
-        that.accountService.logout()
-            .subscribe(
-                res => {
-                    if (typeof res == "boolean" && res) {
-                        that.router.navigate(["/Home"]);
-                    }
-                });
+        this.accountService
+            .logout()
+            .subscribe(() => this.router.navigate(["/Home"]));
     }
 }

@@ -8,56 +8,48 @@ import { Event } from "./event"
 @Injectable()
 export class EventsService extends AppService {
 
-    constructor(
-        private readonly http: HttpClient) {
+    constructor(private readonly http: HttpClient) {
         super();
     }
 
-    index(): Observable<Event[] | string> {
+    index(): Observable<string | Event[]> {
 
         return this.http
-            .get<Event[]>("/events/index")
+            .get<Event[]>("/Events/Index")
             .catch(this.handleError);
     }
 
-    details(id: string): Observable<Event[] | Event | string> {
+    details(id: string | null): Observable<string | Event> {
         
         return this.http
             .get<Event>(`/Events/Details?id=${id}`)
             .catch(this.handleError);
     }
 
-    create(event: Event): Observable<Event[] | Event | string> {
+    create(event: Event): Observable<string> {
 
-        const that = this,
-            body = JSON.stringify(event),
-            options = { headers: that.getHeaders() };
+        const body = JSON.stringify(event),
+            options = { headers: this.getHeaders() };
         
-        return that.http
-            .post<Event>("/Events/Create", body, options)
-            .catch(that.handleError);
+        return this.http
+            .post<string>("/Events/Create", body, options)
+            .catch(this.handleError);
     }
 
-    edit(event: Event): Observable<Event[] | Event | string> {
-        const that = this,
-            body = JSON.stringify(event),
-            options = { headers: that.getHeaders() };
+    edit(event: Event) {
+        const body = JSON.stringify(event),
+            options = { headers: this.getHeaders() };
         
-        return that.http
-            .post<Event>(`/Events/Edit?id=${event.id}`, body, options)
-            .catch(that.handleError);
+        return this.http
+            .put(`/Events/Edit?id=${event.id}`, body, options)
+            .catch(this.handleError);
     }
 
-    delete(id: string): Observable<Event[] | boolean | string> {
-        const that = this,
-            options = { headers: that.getHeaders() };
+    delete(id: string | undefined) {
+        const options = { headers: this.getHeaders() };
 
-        return that.http
-            .post<boolean>(`/Events/Delete?id=${id}`, {}, options)
-            .catch(that.handleError);
-    }
-
-    isEvent(event: Event[] | Event | string): event is Event {
-        return event as Event !== undefined;
+        return this.http
+            .delete(`/Events/Delete?id=${id}`, options)
+            .catch(this.handleError);
     }
 }
