@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,6 +18,8 @@ using community.Core.Interfaces;
 using community.Core.Models;
 using community.Core.Services;
 using community.Data;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using community.Api.v1.Controllers;
 
 namespace community
 {
@@ -47,8 +50,15 @@ namespace community
 
             services.AddTransient<IEmailSender, EmailSender>();
 
-
-            services.AddMvc();
+            services.AddMvc()
+                .ConfigureApplicationPartManager(apm =>
+                {
+                    apm.ApplicationParts.Add(new AssemblyPart(typeof(AccountController).GetTypeInfo().Assembly));
+                    apm.ApplicationParts.Add(new AssemblyPart(typeof(AddressesController).GetTypeInfo().Assembly));
+                    apm.ApplicationParts.Add(new AssemblyPart(typeof(EventsController).GetTypeInfo().Assembly));
+                    apm.ApplicationParts.Add(new AssemblyPart(typeof(ManageController).GetTypeInfo().Assembly));
+                    apm.ApplicationParts.Add(new AssemblyPart(typeof(UsersController).GetTypeInfo().Assembly));
+                });
 
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new Info {Title = "Community API", Version = "v1"}); });
         }
