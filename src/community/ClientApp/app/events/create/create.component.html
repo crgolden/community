@@ -1,0 +1,66 @@
+<div class="row">
+    <div class="col-sm-1 col-md-3"></div>
+    <div class="col-sm-10 col-md-6 text-center">
+        <h2>Create Event</h2>
+        <hr />
+    </div>
+    <div class="col-sm-1 col-md-3"></div>
+</div>
+<div class="row">
+    <div class="col-sm-1 col-md-3"></div>
+    <div class="col-sm-10 col-md-6">
+        <form #f="ngForm" novalidate (ngSubmit)="create(f)">
+
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input [(ngModel)]="model.name" id="name" name="name" type="text" required class="form-control" placeholder="Name" ngModel>
+            </div>
+
+            <div class="form-group">
+                <label for="details">Details</label>
+                <input [(ngModel)]="model.details" id="details" name="details" type="text" required class="form-control" placeholder="Details" ngModel>
+            </div>
+
+            <div class="form-group">
+                <label for="date">Date</label>
+                <input [(ngModel)]="model.date" id="date" name="date" type="datetime" required class="form-control" placeholder="Date" ngModel>
+            </div>
+
+            <div class="form-group">
+                <label for="street">Street</label>
+                <input [(ngModel)]="model.street" id="street" name="street" type="text" required class="form-control" placeholder="Street" ngModel>
+            </div>
+
+            <div class="form-group">
+                <label for="street2">Street 2</label>
+                <input [(ngModel)]="model.street2" id="street2" name="street2" type="text" class="form-control" placeholder="Street 2" ngModel>
+            </div>
+
+            <div class="form-group">
+                <label for="city">City</label>
+                <input [(ngModel)]="model.city" id="city" name="city" type="text" required class="form-control" placeholder="City" ngModel>
+            </div>
+
+            <div class="form-group">
+                <label for="state">State</label>
+                <input [(ngModel)]="model.state" id="state" name="state" type="text" required class="form-control" placeholder="State" ngModel>
+            </div>
+
+            <div class="form-group">
+                <label for="zipCode">Zip Code</label>
+                <input [(ngModel)]="model.zipCode" id="zipCode" name="zipCode" type="text" required class="form-control" placeholder="Zip Code" ngModel>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary" [disabled]="f.invalid">Create</button> |
+                <a routerLink="/Events">Back to List</a>
+            </div>
+
+            <div *ngIf="errors" class="alert alert-danger" role="alert">
+                <strong>Oops!</strong> {{errors}}
+            </div>
+
+        </form>
+    </div>
+    <div class="col-sm-1 col-md-3"></div>
+</div>
