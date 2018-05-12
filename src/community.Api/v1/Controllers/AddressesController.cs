@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using community.Api.v1.Extensions;
 using community.Api.v1.ViewModels;
+using community.Core.Interfaces;
 using community.Core.Models;
 using community.Data;
 using Microsoft.AspNetCore.Authorization;
@@ -15,37 +16,36 @@ namespace community.Api.v1.Controllers
     [Route("api/v1/[controller]/[action]")]
     public class AddressesController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IManager<Address> _addressManager;
 
         private const string Bind = "Id,Street,Street2,City,State,ZipCode,Latitude,Longitude,Home,UserId";
 
-        public AddressesController(ApplicationDbContext context)
+        public AddressesController(IManager<Address> addressManager)
         {
-            _context = context;
+            _addressManager = addressManager;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            return Ok(await _context.Addresses
-                .OrderBy(x => x.Street).Select(x => new AddressViewModel(x)).ToArrayAsync());
+            var addresses = await _addressManager.Index();
+
+            return Ok(addresses.Select(x => new AddressViewModel(x)).ToArray());
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Details([FromRoute] Guid? id)
         {
-            if (id == null)
+            try
+            {
+                var address = await _addressManager.Details(id);
+                if (address == null) return NotFound();
+                return Ok(new AddressViewModel(address));
+            }
+            catch (ArgumentNullException)
             {
                 return BadRequest();
             }
-            var address = await _context.Addresses
-                .Select(x => new AddressViewModel(x)).SingleOrDefaultAsync(m => m.Id == id);
-
-            if (address == null)
-            {
-                return NotFound();
-            }
-            return Ok(address);
         }
 
         // TODO [ValidateAntiForgeryToken]
@@ -53,31 +53,25 @@ namespace community.Api.v1.Controllers
         [Authorize(Policy = "User")]
         public async Task<IActionResult> Create([FromBody] [Bind(Bind)] AddressViewModel model)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            try
             {
-                return BadRequest(ModelState);
+                var address = await _addressManager.Create(new Address
+                {
+                    Street = model.Street.Trim(),
+                    Street2 = model.Street2.Trim(),
+                    City = model.City.Trim(),
+                    State = model.State.Trim(),
+                    ZipCode = model.ZipCode.Trim(),
+                    UserId = model.UserId
+                });
+                model.Id = address.Id;
+                return Ok(model);
             }
-            var address = await model.ExisitingMatch(_context);
-            if (address != null)
+            catch (ArgumentNullException)
             {
-                return Json(address.Id);
+                return BadRequest();
             }
-            address = new Address
-            {
-                Id = Guid.NewGuid(),
-                Street = model.Street,
-                Street2 = model.Street2,
-                City = model.City,
-                State = model.State,
-                ZipCode = model.ZipCode,
-                UserId = model.UserId
-            };
-            _context.Addresses.Add(address);
-
-            await _context.SaveChangesAsync();
-
-            model.Id = address.Id;
-            return Ok(model);
         }
 
         // TODO [ValidateAntiForgeryToken]
@@ -85,33 +79,25 @@ namespace community.Api.v1.Controllers
         [Authorize(Policy = "User")]
         public async Task<IActionResult> Edit([FromRoute] Guid? id, [FromBody] [Bind(Bind)] AddressViewModel model)
         {
-            if (id == null || id.Value != model.Id || !ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            if (id == null || id.Value != model.Id || !ModelState.IsValid) return BadRequest(ModelState);
             try
             {
-                var address = await _context.Addresses.FindAsync(id.Value);
-
-                address.Street = model.Street;
-                address.Street2 = model.Street2;
-                address.City = model.City;
-                address.State = model.State;
-                address.ZipCode = model.ZipCode;
-
-                _context.Update(address);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await _context.Addresses.AnyAsync(x => x.Id == id))
+                await _addressManager.Edit(new Address
                 {
-                    return NotFound();
-                }
-                throw;
+                    Id = model.Id,
+                    Street = model.Street.Trim(),
+                    Street2 = model.Street2.Trim(),
+                    City = model.City.Trim(),
+                    State = model.State.Trim(),
+                    ZipCode = model.ZipCode.Trim(),
+                    UserId = model.UserId
+                });
+                return NoContent();
             }
-
-            return NoContent();
+            catch (ArgumentNullException)
+            {
+                return BadRequest();
+            }
         }
 
         // TODO [ValidateAntiForgeryToken]
@@ -119,19 +105,15 @@ namespace community.Api.v1.Controllers
         [Authorize(Policy = "User")]
         public async Task<IActionResult> Delete([FromRoute] Guid? id)
         {
-            if (id == null)
+            try
+            {
+                await _addressManager.Delete(id);
+                return Ok();
+            }
+            catch (ArgumentNullException)
             {
                 return BadRequest();
             }
-            var address = await _context.Addresses.FindAsync(id.Value);
-            if (address == null)
-            {
-                return NotFound();
-            }
-            _context.Addresses.Remove(address);
-
-            await _context.SaveChangesAsync();
-            return Ok();
         }
     }
 }

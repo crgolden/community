@@ -30,6 +30,11 @@ namespace community.Api.v1.ViewModels
             Date = @event.Date;
             UserId = @event.UserId;
             AddressId = @event.AddressId;
+            Street = @event.Address.Street;
+            Street2 = @event.Address.Street2;
+            City = @event.Address.City;
+            State = @event.Address.City;
+            ZipCode = @event.Address.ZipCode;
         }
     }
 }

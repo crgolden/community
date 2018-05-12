@@ -3,9 +3,8 @@ using System.Collections.Generic;
 
 namespace community.Core.Models
 {
-    public class Address
+    public class Address : BaseModel<Guid>
     {
-        public Guid Id { get; set; }
         public string Street { get; set; }
         public string Street2 { get; set; }
         public string City { get; set; }

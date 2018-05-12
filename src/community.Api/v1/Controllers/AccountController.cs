@@ -56,8 +56,9 @@ namespace community.Api.v1.Controllers
             if (result.Succeeded)
             {
                 user = await _userManager.FindByEmailAsync(model.Email);
-                var generator = new TokenService(_configuration, _userManager);
-                var token = await generator.GenerateToken(user);
+                var claims = await _userManager.GetClaimsAsync(user);
+                var generator = new TokenGenerator(_configuration, claims, user);
+                var token = generator.GenerateToken();
                 _logger.LogInformation("User logged in.");
                 return Json(new UserViewModel(user){ Token = token });
             }
@@ -211,8 +212,9 @@ namespace community.Api.v1.Controllers
                 //await _emailSender.SendEmailConfirmationAsync(model.Email, callbackUrl);
 
                 await _signInManager.SignInAsync(user, isPersistent: false);
-                var generator = new TokenService(_configuration, _userManager);
-                var token = await generator.GenerateToken(user);
+                var claims = await _userManager.GetClaimsAsync(user);
+                var generator = new TokenGenerator(_configuration, claims, user);
+                var token = generator.GenerateToken();
                 _logger.LogInformation("User logged in.");
                 return Json(new UserViewModel(user){ Token = token });
             }

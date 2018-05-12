@@ -20,6 +20,7 @@ using community.Core.Services;
 using community.Data;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using community.Api.v1.Controllers;
+using community.Data.Managers;
 
 namespace community
 {
@@ -39,6 +40,10 @@ namespace community
             services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
+
+            services.AddScoped<DbContext, ApplicationDbContext>();
+            services.AddScoped<IManager<Event>, EventManager>();
+            services.AddScoped<IManager<Address>, AddressManager>();
 
             SetAuthentication(services);
 

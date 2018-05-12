@@ -3,9 +3,8 @@ using System.Collections.Generic;
 
 namespace community.Core.Models
 {
-    public class Event
+    public class Event : BaseModel<Guid>
     {
-        public Guid Id { get; set; }
         public string Name { get; set; }
         public string Details { get; set; }
         public DateTime Date { get; set; }
