@@ -1,7 +1,8 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using community.Api.v1.ViewModels;
-using community.Data;
+using community.Core.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,35 +12,35 @@ namespace community.Api.v1.Controllers
     [Route("api/v1/[controller]/[action]")]
     public class UsersController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly UserManager<User> _userManager;
 
-        public UsersController(ApplicationDbContext context)
+        public UsersController(UserManager<User> userManager)
         {
-            _context = context;
+            _userManager = userManager;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            return Ok(await _context.User
-                .OrderBy(x => x.FirstName).Select(x => new UserViewModel(x)).ToArrayAsync());
+            return Ok(await _userManager.Users
+                .OrderBy(x => x.FirstName)
+                .Select(x => new UserViewModel(x))
+                .ToListAsync());
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Details([FromRoute] string id)
         {
-            if (id == null)
+            if (string.IsNullOrEmpty(id))
             {
                 return BadRequest();
             }
-            var user = await _context.User
-                .Select(x => new UserViewModel(x)).SingleOrDefaultAsync(m => m.Id == id);
-
+            var user = await _userManager.FindByIdAsync(id);
             if (user == null)
             {
                 return NotFound();
             }
-            return Ok(user);
+            return Ok(new UserViewModel(user));
         }
     }
 }

@@ -2,7 +2,7 @@ using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using community.Core.Interfaces;
 
-namespace community.Core.Extensions
+namespace community.Api.v1.Extensions
 {
     public static class EmailSenderExtensions
     {

@@ -12,20 +12,20 @@ namespace community.Data
 {
     public class Seed
     {
-        public readonly ApplicationDbContext Context;
-        public readonly UserManager<User> UserManager;
-        public readonly RoleManager<Role> RoleManager;
-        public User Jim { get; set; }
-        public User Marlene { get; set; }
-        public User Tim { get; set; }
-        public Address YardBar { get; set; }
-        public Address BullCreek { get; set; }
-        public Address AlamoDrafthouse { get; set; }
-        public Event Drinks { get; set; }
-        public Event Softball { get; set; }
-        public Event Movies { get; set; }
+        private readonly ApplicationDbContext _context;
+        private readonly UserManager<User> _userManager;
+        private readonly RoleManager<Role> _roleManager;
+        private User Jim { get; set; }
+        private User Marlene { get; set; }
+        private User Tim { get; set; }
+        private Address YardBar { get; set; }
+        private Address BullCreek { get; set; }
+        private Address AlamoDrafthouse { get; set; }
+        private Event Drinks { get; set; }
+        private Event Softball { get; set; }
+        private Event Movies { get; set; }
 
-        public static IEnumerable<Claim> Claims =>
+        private static IEnumerable<Claim> Claims =>
             new List<Claim>
             {
                 new Claim("Admin", "Create User"),
@@ -45,13 +45,13 @@ namespace community.Data
                 new Claim("User", "Unfollow Event")
             };
 
-        public static IEnumerable<Role> Roles => new List<Role>
+        private static IEnumerable<Role> Roles => new List<Role>
         {
             new Role("User"),
             new Role("Admin")
         };
 
-        public static IEnumerable<User> Users => new List<User>
+        private static IEnumerable<User> Users => new List<User>
         {
             new User
             {
@@ -76,38 +76,39 @@ namespace community.Data
             }
         };
 
-        public Seed(ApplicationDbContext context, UserManager<User> userManager, RoleManager<Role> roleManager)
+        public Seed(ApplicationDbContext context, UserManager<User> userManager,
+            RoleManager<Role> roleManager)
         {
-            Context = context;
-            UserManager = userManager;
-            RoleManager = roleManager;
+            _context = context;
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         public async Task SeedData(string adminEmail, string adminPassword)
         {
-            if (!await RoleManager.Roles.AnyAsync()) await this.CreateRolesAsync();
-            if (!await UserManager.Users.AnyAsync()) await this.CreateUsersAsync(adminEmail, adminPassword);
-            if (!await Context.UserFollowers.AnyAsync()) await this.CreateUserFollowers();
-            if (!await Context.Addresses.AnyAsync()) await this.CreateAddresses();
-            if (!await Context.Events.AnyAsync()) await this.CreateEvents();
-            if (!await Context.EventAttenders.AnyAsync()) await this.CreateEventAttenders();
-            if (!await Context.EventFollowers.AnyAsync()) await this.CreateEventFollowers();
+            if (!await _roleManager.Roles.AnyAsync()) await CreateRolesAsync();
+            if (!await _userManager.Users.AnyAsync()) await CreateUsersAsync(adminEmail, adminPassword);
+            if (!await _context.UserFollowers.AnyAsync()) await CreateUserFollowers();
+            if (!await _context.Addresses.AnyAsync()) await CreateAddresses();
+            if (!await _context.Events.AnyAsync()) await CreateEvents();
+            if (!await _context.EventAttenders.AnyAsync()) await CreateEventAttenders();
+            if (!await _context.EventFollowers.AnyAsync()) await CreateEventFollowers();
         }
 
-        public async Task CreateRolesAsync()
+        private async Task CreateRolesAsync()
         {
-            using (RoleManager)
+            using (_roleManager)
             {
-                foreach (var role in Seed.Roles)
+                foreach (var role in Roles)
                 {
-                    await RoleManager.CreateAsync(role);
-                    foreach (var claim in Seed.Claims.Where(claim => claim.Type == role.Name))
-                        await RoleManager.AddClaimAsync(role, claim);
+                    await _roleManager.CreateAsync(role);
+                    foreach (var claim in Claims.Where(claim => claim.Type == role.Name))
+                        await _roleManager.AddClaimAsync(role, claim);
                 }
             }
         }
 
-        public async Task CreateUsersAsync(string adminEmail, string adminPassword)
+        private async Task CreateUsersAsync(string adminEmail, string adminPassword)
         {
             var admin = new User
             {
@@ -117,26 +118,27 @@ namespace community.Data
                 Email = adminEmail,
                 SecurityStamp = $"{Guid.NewGuid()}"
             };
-            using (UserManager)
+            using (_userManager)
             {
-                await UserManager.CreateAsync(admin, adminPassword);
-                await UserManager.AddToRolesAsync(admin, Seed.Roles.Select(role => role.Name));
-                await UserManager.AddClaimsAsync(admin, Seed.Claims);
+                await _userManager.CreateAsync(admin, adminPassword);
+                await _userManager.AddToRolesAsync(admin, Roles.Select(role => role.Name));
+                await _userManager.AddClaimsAsync(admin, Claims);
 
                 foreach (var user in Users)
                 {
-                    await UserManager.CreateAsync(user, "@Password1");
-                    await UserManager.AddToRoleAsync(user, "User");
-                    await UserManager.AddClaimsAsync(user, Seed.Claims.Where(claim =>
+                    await _userManager.CreateAsync(user, "@Password1");
+                    await _userManager.AddToRoleAsync(user, "User");
+                    await _userManager.AddClaimsAsync(user, Claims.Where(claim =>
                         claim.Type.Equals("User")));
                 }
-                Jim = await UserManager.FindByEmailAsync("jim@gmail.com");
-                Marlene = await UserManager.FindByEmailAsync("marlene@gmail.com");
-                Tim = await UserManager.FindByEmailAsync("tim@gmail.com");
+
+                Jim = await _userManager.FindByEmailAsync("jim@gmail.com");
+                Marlene = await _userManager.FindByEmailAsync("marlene@gmail.com");
+                Tim = await _userManager.FindByEmailAsync("tim@gmail.com");
             }
         }
 
-        public async Task CreateUserFollowers()
+        private async Task CreateUserFollowers()
         {
             var userFollowers = new List<UserFollower>
             {
@@ -162,11 +164,11 @@ namespace community.Data
                 }
             };
 
-            await Context.UserFollowers.AddRangeAsync(userFollowers);
-            await Context.SaveChangesAsync();
+            await _context.UserFollowers.AddRangeAsync(userFollowers);
+            await _context.SaveChangesAsync();
         }
 
-        public async Task CreateAddresses()
+        private async Task CreateAddresses()
         {
             var addresses = new List<Address>
             {
@@ -244,21 +246,21 @@ namespace community.Data
                 }
             };
 
-            await Context.Addresses.AddRangeAsync(addresses);
-            await Context.SaveChangesAsync();
+            await _context.Addresses.AddRangeAsync(addresses);
+            await _context.SaveChangesAsync();
 
-            YardBar = await Context.Addresses.SingleAsync(address =>
+            YardBar = await _context.Addresses.SingleAsync(address =>
                 address.Latitude == "30.343087" &&
                 address.Longitude == "-97.739128");
-            BullCreek = await Context.Addresses.SingleAsync(address =>
+            BullCreek = await _context.Addresses.SingleAsync(address =>
                 address.Latitude == "30.368693" &&
                 address.Longitude == "-97.784469");
-            AlamoDrafthouse = await Context.Addresses.SingleAsync(address =>
+            AlamoDrafthouse = await _context.Addresses.SingleAsync(address =>
                 address.Latitude == "30.360028" &&
                 address.Longitude == "-97.734848");
         }
 
-        public async Task CreateEvents()
+        private async Task CreateEvents()
         {
             var events = new List<Event>
             {
@@ -288,18 +290,18 @@ namespace community.Data
                 }
             };
 
-            await Context.Events.AddRangeAsync(events);
-            await Context.SaveChangesAsync();
+            await _context.Events.AddRangeAsync(events);
+            await _context.SaveChangesAsync();
 
-            Drinks = await Context.Events.SingleAsync(@event =>
+            Drinks = await _context.Events.SingleAsync(@event =>
                 @event.Name == "Drinks");
-            Softball = await Context.Events.SingleAsync(@event =>
+            Softball = await _context.Events.SingleAsync(@event =>
                 @event.Name == "Softball");
-            Movies = await Context.Events.SingleAsync(@event =>
+            Movies = await _context.Events.SingleAsync(@event =>
                 @event.Name == "Movies");
         }
 
-        public async Task CreateEventAttenders()
+        private async Task CreateEventAttenders()
         {
             var eventAttenders = new List<EventAttender>
             {
@@ -330,11 +332,11 @@ namespace community.Data
                 }
             };
 
-            await Context.EventAttenders.AddRangeAsync(eventAttenders);
-            await Context.SaveChangesAsync();
+            await _context.EventAttenders.AddRangeAsync(eventAttenders);
+            await _context.SaveChangesAsync();
         }
 
-        public async Task CreateEventFollowers()
+        private async Task CreateEventFollowers()
         {
             var eventFollowers = new List<EventFollower>
             {
@@ -360,8 +362,8 @@ namespace community.Data
                 }
             };
 
-            await Context.EventFollowers.AddRangeAsync(eventFollowers);
-            await Context.SaveChangesAsync();
+            await _context.EventFollowers.AddRangeAsync(eventFollowers);
+            await _context.SaveChangesAsync();
         }
     }
 }
