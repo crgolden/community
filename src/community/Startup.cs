@@ -14,13 +14,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Swagger;
+using community.Api.v1.Controllers;
 using community.Core.Interfaces;
 using community.Core.Models;
 using community.Core.Services;
 using community.Data;
-using Microsoft.AspNetCore.Mvc.ApplicationParts;
-using community.Api.v1.Controllers;
 using community.Data.Managers;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
 
 namespace community
 {
