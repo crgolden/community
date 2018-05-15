@@ -14,7 +14,7 @@ I built this app to practice with [ASP.NET Core](https://www.asp.net/core) and [
 #### Tools and Technologies
 
 1. [ASP.NET Identity](https://www.asp.net/identity) - User authentication/authorization
-2. [Bootstrap](http://getbootstrap.com/) and, [Font Awesome](https://fontawesome.com/) - CSS styling
+2. [Bootstrap](http://getbootstrap.com/) and [Font Awesome](https://fontawesome.com/) - CSS styling
 3. [Swagger](https://swagger.io/) - API documentation
 4. [webpack](https://webpack.js.org/) - Bundling
 5. [Visual Studio Team Services (VSTS)](https://visualstudio.com/) - Continuous integration (CI) and deployment (CD)
