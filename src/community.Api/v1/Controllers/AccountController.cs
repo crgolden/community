@@ -1,10 +1,12 @@
-﻿using System.Net;
+﻿using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using community.Api.v1.ViewModels;
 using community.Api.v1.ViewModels.AccountViewModels;
 using community.Core.Interfaces;
 using community.Core.Models;
 using community.Core.Services;
+using community.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +15,7 @@ using Microsoft.Extensions.Logging;
 
 namespace community.Api.v1.Controllers
 {
+    //[EnableCors("<YourCorsPolicyName>")]
     [Authorize(Policy = "User")]
     [Produces("application/json")]
     [Route("api/v1/[controller]/[action]")]
@@ -23,19 +26,22 @@ namespace community.Api.v1.Controllers
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
         private readonly IConfiguration _configuration;
+        private readonly ITokenGenerator _tokenGenerator;
 
         public AccountController(
             UserManager<User> userManager,
             SignInManager<User> signInManager,
             IEmailSender emailSender,
             ILogger<AccountController> logger,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            ITokenGenerator tokenGenerator)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
             _logger = logger;
             _configuration = configuration;
+            _tokenGenerator = tokenGenerator;
         }
 
         [TempData]
@@ -46,21 +52,18 @@ namespace community.Api.v1.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginViewModel model, string returnUrl = null)
         {
-            var user = new User {Email = model.Email};
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
+            if (await _userManager.CheckPasswordAsync(user, model.Password))
             {
-                Response.StatusCode = (int) HttpStatusCode.BadRequest;
-                return Json(null);
-            }
-            var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
-            if (result.Succeeded)
-            {
-                user = await _userManager.FindByEmailAsync(model.Email);
-                var claims = await _userManager.GetClaimsAsync(user);
-                var generator = new TokenGenerator(_configuration, claims, user);
-                var token = generator.GenerateToken();
                 _logger.LogInformation("User logged in.");
-                return Json(new UserViewModel(user){ Token = token });
+
+                var claims = await _userManager.GetClaimsAsync(user);
+                var token = _tokenGenerator.GenerateToken(user.Email, claims);
+
+                return Ok(new UserViewModel(user){ Token = token });
             }
             // TODO
             //if (result.RequiresTwoFactor)
@@ -72,8 +75,9 @@ namespace community.Api.v1.Controllers
             //    _logger.LogWarning("User account locked out.");
             //    return RedirectToAction(nameof(Lockout));
             //}
-            Response.StatusCode = (int) HttpStatusCode.BadRequest;
-            return Json(new UserViewModel(user));
+            ModelState.AddModelError("login_failure", "Invalid username or password.");
+
+            return BadRequest(ModelState);
         }
 
         //[HttpGet]
@@ -192,7 +196,7 @@ namespace community.Api.v1.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] RegisterViewModel model, string returnUrl = null)
         {
-            if (!ModelState.IsValid) return Json(model);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var user = new User
             {
@@ -202,27 +206,30 @@ namespace community.Api.v1.Controllers
                 LastName = model.LastName
             };
             var result = await _userManager.CreateAsync(user, model.Password);
+
             if (result.Succeeded)
             {
                 _logger.LogInformation("User created a new account with password.");
+
+                var claims = Seed.Claims.Where(claim => claim.Type.Equals("User")).ToList();
+
+                await _userManager.AddToRoleAsync(user, "User");
+                await _userManager.AddClaimsAsync(user, claims);
 
                 // TODO
                 //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 //var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
                 //await _emailSender.SendEmailConfirmationAsync(model.Email, callbackUrl);
 
-                await _signInManager.SignInAsync(user, isPersistent: false);
-                var claims = await _userManager.GetClaimsAsync(user);
-                var generator = new TokenGenerator(_configuration, claims, user);
-                var token = generator.GenerateToken();
-                _logger.LogInformation("User logged in.");
-                return Json(new UserViewModel(user){ Token = token });
-            }
-            // TODO
-            //AddErrors(result);
+                var token = _tokenGenerator.GenerateToken(user.Email, claims);
 
-            // If we got this far, something failed, redisplay form
-            return Json(model);
+                _logger.LogInformation("User logged in.");
+
+                return Ok(new UserViewModel(user){ Token = token });
+            }
+            AddErrors(result);
+
+            return BadRequest(ModelState);
         }
 
         // TODO [ValidateAntiForgeryToken]
@@ -231,8 +238,11 @@ namespace community.Api.v1.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
+
+            
             _logger.LogInformation("User logged out.");
-            return Json(true);
+            
+            return Ok(true);
         }
 
         //// TODO [ValidateAntiForgeryToken]
@@ -421,13 +431,13 @@ namespace community.Api.v1.Controllers
 
         #region Helpers
 
-        //private void AddErrors(IdentityResult result)
-        //{
-        //    foreach (var error in result.Errors)
-        //    {
-        //        ModelState.AddModelError(string.Empty, error.Description);
-        //    }
-        //}
+        private void AddErrors(IdentityResult result)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(error.Code, error.Description);
+            }
+        }
 
         //private IActionResult RedirectToLocal(string returnUrl)
         //{

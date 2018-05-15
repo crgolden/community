@@ -1,26 +1,21 @@
-using System;
-using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
-using Swashbuckle.AspNetCore.Swagger;
 using community.Api.v1.Controllers;
 using community.Core.Interfaces;
 using community.Core.Models;
 using community.Core.Services;
 using community.Data;
 using community.Data.Managers;
-using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using community.Extensions;
 
 namespace community
 {
@@ -35,7 +30,9 @@ namespace community
 
         public void ConfigureServices(IServiceCollection services)
         {
-            SetDbContext(services);
+            services.AddDbContext(
+               windowsConnectionString: Configuration.GetConnectionString("WindowsConnection"),
+               macOsConnectionString: Configuration.GetConnectionString("macOsConnection"));
 
             services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -45,7 +42,9 @@ namespace community
             services.AddScoped<IManager<Event>, EventManager>();
             services.AddScoped<IManager<Address>, AddressManager>();
 
-            SetAuthentication(services);
+            services.AddSingleton<ITokenGenerator, TokenGenerator>();
+
+            services.AddAuthentication(Configuration.GetSection(nameof(JwtOptions)));
 
             services.AddAuthorization(options =>
             {
@@ -65,7 +64,7 @@ namespace community
                     apm.ApplicationParts.Add(new AssemblyPart(typeof(UsersController).GetTypeInfo().Assembly));
                 });
 
-            services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new Info {Title = "Community API", Version = "v1"}); });
+            services.AddSwaggerDocumentation();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env,
@@ -94,8 +93,9 @@ namespace community
 
             app.UseAuthentication();
 
-            app.UseSwagger();
-            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Community API V1"); });
+            //app.UseCors();
+
+            app.UseSwaggerDocumentation();
 
             app.UseMvc(routes =>
             {
@@ -114,50 +114,5 @@ namespace community
             Task.Run(() => seed.SeedData(adminEmail, adminPassword)).Wait();
         }
 
-        private void SetDbContext(IServiceCollection services)
-        {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                services.AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlServer(Configuration.GetConnectionString("WindowsConnection"),
-                        x => x.MigrationsAssembly("community.Data")));
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                services.AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlite(Configuration.GetConnectionString("macOSConnection"),
-                        x => x.MigrationsAssembly("community.Data")));
-        }
-
-        private void SetAuthentication(IServiceCollection services)
-        {
-            var tokenOptions = Configuration
-                .GetSection("TokenProviderOptions")
-                .GetChildren()
-                .ToList();
-            string
-                secretKey = tokenOptions.Single(x => x.Key.Equals("SecretKey")).Value,
-                issuer = tokenOptions.Single(x => x.Key.Equals("Issuer")).Value,
-                audience = tokenOptions.Single(x => x.Key.Equals("Audience")).Value;
-            var secretKeyBytes = Encoding.UTF8.GetBytes(secretKey);
-            var signingKey = new SymmetricSecurityKey(secretKeyBytes);
-            var tokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = signingKey,
-                ValidateAudience = true,
-                ValidAudience = audience,
-                ValidateIssuer = true,
-                ValidIssuer = issuer,
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero
-            };
-            services.AddAuthentication()
-                .AddJwtBearer(options =>
-                {
-                    options.Audience = audience;
-                    options.ClaimsIssuer = issuer;
-                    options.TokenValidationParameters = tokenValidationParameters;
-                    options.SaveToken = true;
-                    options.RequireHttpsMetadata = false;
-                });
-        }
     }
 }

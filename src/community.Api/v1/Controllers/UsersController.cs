@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace community.Api.v1.Controllers
 {
+    //[EnableCors("<YourCorsPolicyName>")]
     [Produces("application/json")]
     [Route("api/v1/[controller]/[action]")]
     public class UsersController : Controller

@@ -16,9 +16,9 @@ I built this app to practice with [ASP.NET Core 2](https://www.asp.net/core) and
 1. [ASP.NET Identity](https://www.asp.net/identity) - User authentication/authorization
 2. [Bootstrap 4](http://getbootstrap.com/) and, [Font Awesome 5](https://fontawesome.com/) - CSS styling
 3. [Swagger 2](https://swagger.io/) - API documentation
-4. [webpack](https://webpack.js.org/) - Bundling
+4. [webpack 4](https://webpack.js.org/) - Bundling
 5. [Visual Studio Team Services (VSTS)](https://visualstudio.com/) - Continuous integration (CI) and deployment (CD)
 6. [Azure](https://azure.microsoft.com/) - Application hosting
 7. [SQL Server](https://www.microsoft.com/en-us/cloud-platform/sql-server) on Windows and [SQLite](https://www.sqlite.org/) on macOS - Database
-8. [xUnit.net](https://xunit.github.io/) - C# testing
-9. [Karma](http://karma-runner.github.io/2.0/) and [Jasmine](https://jasmine.github.io/) - Angular testing
+8. [xUnit.net 2](https://xunit.github.io/) - C# testing
+9. [Karma 2](http://karma-runner.github.io/2.0/) and [Jasmine 3](https://jasmine.github.io/) - Angular testing

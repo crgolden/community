@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace community.Api.v1.Controllers
 {
+    //[EnableCors("<YourCorsPolicyName>")]
     [Authorize]
     [Produces("application/json")]
     [Route("api/v1/[controller]/[action]")]

@@ -25,7 +25,7 @@ namespace community.Data
         private Event Softball { get; set; }
         private Event Movies { get; set; }
 
-        private static IEnumerable<Claim> Claims =>
+        public static IEnumerable<Claim> Claims =>
             new List<Claim>
             {
                 new Claim("Admin", "Create User"),
