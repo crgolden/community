@@ -17,11 +17,11 @@ export class CreateComponent {
     constructor(
         private readonly eventsService: EventsService,
         private readonly router: Router) {
-        this.model.userId = this.eventsService.getUser().id;
     }
 
     create(valid: boolean) {
         if (valid) {
+            this.model.userId = this.eventsService.getUser().id;
             this.eventsService
                 .create(this.model)
                 .subscribe(

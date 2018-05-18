@@ -17,11 +17,11 @@ export class CreateComponent {
     constructor(
         private readonly addressesService: AddressesService,
         private readonly router: Router) {
-        this.model.userId = this.addressesService.getUser().id;
     }
 
     create(valid: boolean) {
         if (valid) {
+            this.model.userId = this.addressesService.getUser().id;
             this.addressesService
                 .create(this.model)
                 .subscribe(

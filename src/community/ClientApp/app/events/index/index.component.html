@@ -9,13 +9,28 @@
 <div class="row">
     <div class="col-sm-1 col-md-3"></div>
     <div class="col-sm-10 col-md-6">
-        <ul class="list-group">
-            <li *ngFor="let event of events" class="list-group-item">
-                <a routerLink="/Events/Details/{{event.id}}">
-                    {{event.name}}
-                </a>
-            </li>
-        </ul>
+        <div class="row">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let event of events">
+                        <td>
+                            <a routerLink="/Events/Details/{{event.id}}">
+                                {{event.name}}
+                            </a>
+                        </td>
+                        <td>
+                            {{event.date | date}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
     <div class="col-sm-1 col-md-3"></div>
 </div>

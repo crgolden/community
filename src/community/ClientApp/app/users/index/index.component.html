@@ -9,13 +9,24 @@
 <div class="row">
     <div class="col-sm-1 col-md-3"></div>
     <div class="col-sm-10 col-md-6">
-        <ul class="list-group">
-            <li *ngFor="let user of users" class="list-group-item">
-                <a routerLink="/Users/Details/{{user.id}}">
-                    {{user.firstName}} {{user.lastName}}
-                </a>
-            </li>
-        </ul>
+        <div class="row">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let user of users">
+                        <td>
+                            <a routerLink="/Users/Details/{{user.id}}">
+                                {{user.firstName}} {{user.lastName}}
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
     <div class="col-sm-1 col-md-3"></div>
 </div>

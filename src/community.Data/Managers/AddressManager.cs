@@ -31,15 +31,14 @@ namespace community.Data.Managers
 
         public override async Task<Address> Create(Address address)
         {
+            if (address == null) throw new ArgumentNullException();
+
             var existing = await Context.Set<Address>().FirstOrDefaultAsync(x =>
                 x.Street.Equals(address.Street, StringComparison.InvariantCultureIgnoreCase) &&
                 x.City.Equals(address.City, StringComparison.InvariantCultureIgnoreCase) &&
                 x.State.Equals(address.State, StringComparison.InvariantCultureIgnoreCase) &&
                 x.ZipCode.Equals(address.ZipCode, StringComparison.InvariantCultureIgnoreCase));
-            if (existing != null)
-            {
-                return existing;
-            }
+            if (existing != null) return existing;
             Context.Set<Address>().Add(address);
             await Context.SaveChangesAsync();
             return address;

@@ -28,6 +28,7 @@ namespace community.Data.Managers
         public override async Task<Event> Details(Guid? id)
         {
             if (!id.HasValue) throw new ArgumentNullException();
+
             return await Context.Set<Event>()
                 .AsNoTracking()
                 .Include(x => x.Address)
@@ -36,6 +37,5 @@ namespace community.Data.Managers
                 .Include(x => x.Followers)
                 .SingleOrDefaultAsync(x => x.Id == id.Value);
         }
-
     }
 }

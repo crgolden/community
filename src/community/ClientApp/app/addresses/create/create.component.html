@@ -13,27 +13,27 @@
 
             <div class="form-group">
                 <label for="street">Street</label>
-                <input [(ngModel)]="model.street" id="street" name="street" type="text" required class="form-control" placeholder="Street">
+                <input [(ngModel)]="model.street" id="street" name="street" type="text" required class="form-control" placeholder="Street" #street="ngModel">
             </div>
 
             <div class="form-group">
                 <label for="street2">Street 2</label>
-                <input [(ngModel)]="model.street2" id="street2" name="street2" type="text" class="form-control" placeholder="Street 2">
+                <input [(ngModel)]="model.street2" id="street2" name="street2" type="text" class="form-control" placeholder="Street 2" #street2="ngModel">
             </div>
 
             <div class="form-group">
                 <label for="city">City</label>
-                <input [(ngModel)]="model.city" id="city" name="city" type="text" required class="form-control" placeholder="City">
+                <input [(ngModel)]="model.city" id="city" name="city" type="text" required class="form-control" placeholder="City" #city="ngModel">
             </div>
 
             <div class="form-group">
                 <label for="state">State</label>
-                <input [(ngModel)]="model.state" id="state" name="state" type="text" required class="form-control" placeholder="State">
+                <input [(ngModel)]="model.state" id="state" name="state" type="text" required class="form-control" placeholder="State" #state="ngModel">
             </div>
 
             <div class="form-group">
                 <label for="zipCode">Zip Code</label>
-                <input [(ngModel)]="model.zipCode" id="zipCode" name="zipCode" type="text" required class="form-control" placeholder="Zip Code">
+                <input [(ngModel)]="model.zipCode" id="zipCode" name="zipCode" type="text" required class="form-control" placeholder="Zip Code" #zipCode="ngModel">
             </div>
 
             <div class="form-group">

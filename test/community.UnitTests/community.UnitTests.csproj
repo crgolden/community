@@ -6,12 +6,24 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\community.Api\community.Api.csproj" />
+    <ProjectReference Include="..\..\src\community.Core\community.Core.csproj" />
+    <ProjectReference Include="..\..\src\community.Data\community.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.0.2" />
+    <PackageReference Include="Moq" Version="4.7.142" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.0.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.0" />
+    <PackageReference Include="NETStandard.Library" Version="2.0.2" />
     <PackageReference Include="xunit" Version="2.3.1" />
+    <PackageReference Include="xunit.runner.console" Version="2.3.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <DotNetCliToolReference Include="Microsoft.DotNet.Watcher.Tools" Version="2.0.1" />
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
   </ItemGroup>
 

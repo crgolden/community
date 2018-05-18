@@ -21,21 +21,18 @@ namespace community.Api.v1.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            return Ok(await _userManager.Users
+            return Ok(_userManager.Users
+                .AsNoTracking()
                 .OrderBy(x => x.FirstName)
                 .Select(x => new UserViewModel(x))
-                .ToListAsync());
+                .AsEnumerable());
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Details([FromRoute] string id)
         {
-            if (string.IsNullOrEmpty(id))
-            {
-                return BadRequest();
-            }
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
             {
