@@ -1,7 +1,8 @@
-﻿import { Injectable } from "@angular/core";
+import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { Observable } from "rxjs/Rx";
 import { ActivatedRoute } from "@angular/router";
+import { Observable } from "rxjs";
+import { map, catchError } from "rxjs/operators";
 
 import { AppService } from "../app.service";
 import { User } from "../users/user"
@@ -24,17 +25,17 @@ export class AccountService extends AppService {
     register(value: Register): Observable<string | boolean> {
 
         const body = JSON.stringify(value),
-            options = { headers: this.getHeaders() }
+            options = { headers: this.getHeaders() };
 
         return this.http
-            .post<User>("/api/v1/Account/Register", body, options)
-            .map(res => {
-                this.setUser(res);
-                this.setExpiration(new Date());
-                this.isLoggedIn.emit(true);
-                return true;
-            })
-            .catch(this.handleError);
+            .post<User>("/api/v1/Account/Register", body, options).pipe(
+                map(res => {
+                    this.setUser(res);
+                    this.setExpiration(new Date());
+                    this.isLoggedIn.emit(true);
+                    return true;
+                }),
+                catchError(this.handleError),);
     }
 
     login(value: Login): Observable<string | boolean> {
@@ -42,32 +43,32 @@ export class AccountService extends AppService {
             options = { headers: this.getHeaders() };
 
         return this.http
-            .post<User>("/api/v1/Account/Login", body, options)
-            .map(res => {
-                this.setUser(res);
-                this.setExpiration(new Date());
-                this.isLoggedIn.emit(true);
-                return true;
-            })
-            .catch(this.handleError);
+            .post<User>("/api/v1/Account/Login", body, options).pipe(
+                map(res => {
+                    this.setUser(res);
+                    this.setExpiration(new Date());
+                    this.isLoggedIn.emit(true);
+                    return true;
+                }),
+                catchError(this.handleError),);
     }
 
     logout(): Observable<string | boolean> {
         const options = { headers: this.getHeaders() };
 
         return this.http
-            .post<boolean>("/api/v1/Account/Logout", {}, options)
-            .map(() => {
-                this.removeUser();
-                this.removeExpiration();
-                this.isLoggedIn.emit(false);
-                return true;
-            })
-            .catch(this.handleError);
+            .post<boolean>("/api/v1/Account/Logout", {}, options).pipe(
+                map(() => {
+                    this.removeUser();
+                    this.removeExpiration();
+                    this.isLoggedIn.emit(false);
+                    return true;
+                }),
+                catchError(this.handleError),);
     }
 
     private setReturnUrlFromQueryParams(): void {
-        this.route.queryParams.subscribe(params => {
+        this.route.queryParams.subscribe((params: any) => {
             var returnUrl = params["returnUrl"];
             if (typeof returnUrl == "undefined") {
                 returnUrl = params["ReturnUrl"];

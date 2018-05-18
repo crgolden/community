@@ -1,5 +1,5 @@
-﻿import { } from "jasmine";
-import { defer } from "rxjs/observable/defer";
+import { } from "jasmine";
+import { defer as observableDefer } from "rxjs";
 
 import { UsersService } from "./users.service";
 import { User } from "./user"
@@ -20,7 +20,7 @@ describe("UsersService", () => {
     it("index should return a list of users", () => {
         const users: Array<User> = [user1, user2];
 
-        httpClientSpy.get.and.returnValue(defer(() => Promise.resolve(users)));
+        httpClientSpy.get.and.returnValue(observableDefer(() => Promise.resolve(users)));
 
         usersService
             .index()
@@ -32,7 +32,7 @@ describe("UsersService", () => {
     });
 
     it("details should return a user", () => {
-        httpClientSpy.get.and.returnValue(defer(() => Promise.resolve(user1)));
+        httpClientSpy.get.and.returnValue(observableDefer(() => Promise.resolve(user1)));
 
         usersService
             .details("1")

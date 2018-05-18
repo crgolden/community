@@ -1,5 +1,5 @@
-﻿import { } from "jasmine";
-import { defer } from "rxjs/observable/defer";
+import { } from "jasmine";
+import { defer as observableDefer } from "rxjs";
 
 import { AddressesService } from "./addresses.service";
 import { Address } from "./address"
@@ -20,7 +20,7 @@ describe("AddressesService", () => {
     it("index should return a list of addresses", () => {
         const addresses: Array<Address> = [address1, address2];
 
-        httpClientSpy.get.and.returnValue(defer(() => Promise.resolve(addresses)));
+        httpClientSpy.get.and.returnValue(observableDefer(() => Promise.resolve(addresses)));
 
         addressesService
             .index()
@@ -32,7 +32,7 @@ describe("AddressesService", () => {
     });
 
     it("details should return an address", () => {
-        httpClientSpy.get.and.returnValue(defer(() => Promise.resolve(address1)));
+        httpClientSpy.get.and.returnValue(observableDefer(() => Promise.resolve(address1)));
 
         addressesService
             .details("1")
@@ -44,7 +44,7 @@ describe("AddressesService", () => {
     });
 
     it("create should return an address", () => {
-        httpClientSpy.post.and.returnValue(defer(() => Promise.resolve(address1)));
+        httpClientSpy.post.and.returnValue(observableDefer(() => Promise.resolve(address1)));
 
         addressesService
             .create(address1)
@@ -56,7 +56,7 @@ describe("AddressesService", () => {
     });
 
     it("edit should not return anything", () => {
-        httpClientSpy.put.and.returnValue(defer(() => Promise.resolve()));
+        httpClientSpy.put.and.returnValue(observableDefer(() => Promise.resolve()));
 
         addressesService
             .edit(address1)
@@ -68,7 +68,7 @@ describe("AddressesService", () => {
     });
 
     it("delete should not return anything", () => {
-        httpClientSpy.delete.and.returnValue(defer(() => Promise.resolve()));
+        httpClientSpy.delete.and.returnValue(observableDefer(() => Promise.resolve()));
 
         addressesService
             .delete(address1.id)

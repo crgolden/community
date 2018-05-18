@@ -87,7 +87,7 @@ namespace community.Api.v1.Controllers
                 {
                     Id = model.Id,
                     Street = model.Street.Trim(),
-                    Street2 = model.Street2.Trim(),
+                    Street2 = model.Street2?.Trim(),
                     City = model.City.Trim(),
                     State = model.State.Trim(),
                     ZipCode = model.ZipCode.Trim(),

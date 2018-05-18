@@ -1,7 +1,7 @@
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
-import { HttpModule } from "@angular/http";
+import { HttpClientModule } from "@angular/common/http";
 import { RouterModule } from "@angular/router";
 import { AccountModule } from "./account/account.module"
 import { UsersModule } from "./users/users.module"
@@ -22,7 +22,7 @@ import { AppService } from "./app.service"
     ],
     imports: [
         CommonModule,
-        HttpModule,
+        HttpClientModule,
         FormsModule,
         RouterModule.forRoot([
             { path: "", redirectTo: "Home", pathMatch: "full" },

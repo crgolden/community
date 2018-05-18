@@ -1,6 +1,7 @@
-﻿import { Injectable } from "@angular/core";
+import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { Observable } from "rxjs/Rx";
+import { Observable } from "rxjs";
+import { catchError } from "rxjs/operators";
 
 import { AppService } from "../app.service";
 import { Address } from "./address"
@@ -15,15 +16,15 @@ export class AddressesService extends AppService {
     index(): Observable<string | Address[]> {
 
         return this.http
-            .get<Address[]>("/api/v1/Addresses/Index")
-            .catch(this.handleError);
+            .get<Address[]>("/api/v1/Addresses/Index").pipe(
+            catchError(this.handleError));
     }
 
     details(id: string | null): Observable<string | Address> {
 
         return this.http
-            .get<Address>(`/api/v1/Addresses/Details/${id}`)
-            .catch(this.handleError);
+            .get<Address>(`/api/v1/Addresses/Details/${id}`).pipe(
+            catchError(this.handleError));
     }
 
     create(address: Address): Observable<string | Address> {
@@ -32,8 +33,8 @@ export class AddressesService extends AppService {
             options = { headers: this.getHeaders() };
 
         return this.http
-            .post<Address>("/api/v1/Addresses/Create", body, options)
-            .catch(this.handleError);
+            .post<Address>("/api/v1/Addresses/Create", body, options).pipe(
+            catchError(this.handleError));
     }
 
     edit(address: Address) {
@@ -41,15 +42,15 @@ export class AddressesService extends AppService {
             options = { headers: this.getHeaders() };
 
         return this.http
-            .put(`/api/v1/Addresses/Edit/${address.id}`, body, options)
-            .catch(this.handleError);
+            .put(`/api/v1/Addresses/Edit/${address.id}`, body, options).pipe(
+            catchError(this.handleError));
     }
 
     delete(id: string | undefined) {
         const options = { headers: this.getHeaders() };
 
         return this.http
-            .delete(`/api/v1/Addresses/Delete/${id}`, options)
-            .catch(this.handleError);
+            .delete(`/api/v1/Addresses/Delete/${id}`, options).pipe(
+            catchError(this.handleError));
     }
 }

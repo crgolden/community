@@ -1,6 +1,7 @@
-﻿import { Injectable } from "@angular/core";
+import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { Observable } from "rxjs/Rx";
+import { Observable } from "rxjs";
+import { catchError } from "rxjs/operators";
 
 import { AppService } from "../app.service";
 import { User } from "./user"
@@ -15,14 +16,14 @@ export class UsersService extends AppService {
     index(): Observable<string | User[]> {
 
         return this.http
-            .get<User[]>("/api/v1/Users/Index")
-            .catch(this.handleError);
+            .get<User[]>("/api/v1/Users/Index").pipe(
+            catchError(this.handleError));
     }
 
     details(id: string | null): Observable<string | User> {
 
         return this.http
-            .get<User>(`/api/v1/Users/Details/${id}`)
-            .catch(this.handleError);
+            .get<User>(`/api/v1/Users/Details/${id}`).pipe(
+            catchError(this.handleError));
     }
 }

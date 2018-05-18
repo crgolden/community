@@ -1,6 +1,6 @@
 ﻿import { Injectable, Output, EventEmitter } from "@angular/core"
-import { HttpHeaders } from "@angular/common/http";
-import { Observable } from "rxjs/Rx";
+import { HttpHeaders, HttpErrorResponse } from "@angular/common/http";
+import { Observable, throwError } from "rxjs";
 
 import { User } from "./users/user"
 
@@ -9,23 +9,20 @@ export class AppService {
 
     @Output() isLoggedIn = new EventEmitter<boolean>();
 
-    protected handleError(error: any): Observable<string> {
-        const applicationError = error.headers.get("Application-Error");
-
-        if (applicationError) {
-            return Observable.throw(applicationError);
+    protected handleError(error: HttpErrorResponse): Observable<string> {
+        if (error.error instanceof ErrorEvent) {
+            // A client-side or network error occurred. Handle it accordingly.
+            console.error("An error occurred:", error.error.message);
+        } else {
+            // The backend returned an unsuccessful response code.
+            // The response body may contain clues as to what went wrong,
+            console.error(
+                `Backend returned code ${error.status}, ` +
+                `body was: ${error.error}`);
         }
-
-        let modelStateErrors: string = "";
-
-        if (!error.type) {
-            for (let key in error) {
-                if (error.hasOwnProperty(key) && error[key])
-                    modelStateErrors += error[key] + "\n";
-            }
-        }
-
-        return Observable.throw(modelStateErrors || "Server error");
+        // return an observable with a user-facing error message
+        return throwError(
+            "Something bad happened; please try again later.");
     }
 
     protected setUser(user: User): void {

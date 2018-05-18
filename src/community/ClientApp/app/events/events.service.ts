@@ -1,6 +1,7 @@
-﻿import { Injectable } from "@angular/core";
+import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { Observable } from "rxjs/Rx";
+import { Observable } from "rxjs";
+import { catchError } from "rxjs/operators";
 
 import { AppService } from "../app.service";
 import { Event } from "./event"
@@ -15,15 +16,15 @@ export class EventsService extends AppService {
     index(): Observable<string | Event[]> {
 
         return this.http
-            .get<Event[]>("/api/v1/Events/Index")
-            .catch(this.handleError);
+            .get<Event[]>("/api/v1/Events/Index").pipe(
+            catchError(this.handleError));
     }
 
     details(id: string | null): Observable<string | Event> {
 
         return this.http
-            .get<Event>(`/api/v1/Events/Details/${id}`)
-            .catch(this.handleError);
+            .get<Event>(`/api/v1/Events/Details/${id}`).pipe(
+            catchError(this.handleError));
     }
 
     create(event: Event): Observable<string | Event> {
@@ -32,8 +33,8 @@ export class EventsService extends AppService {
             options = { headers: this.getHeaders() };
 
         return this.http
-            .post<Event>("/api/v1/Events/Create", body, options)
-            .catch(this.handleError);
+            .post<Event>("/api/v1/Events/Create", body, options).pipe(
+            catchError(this.handleError));
     }
 
     edit(event: Event) {
@@ -41,15 +42,15 @@ export class EventsService extends AppService {
             options = { headers: this.getHeaders() };
 
         return this.http
-            .put(`/api/v1/Events/Edit/${event.id}`, body, options)
-            .catch(this.handleError);
+            .put(`/api/v1/Events/Edit/${event.id}`, body, options).pipe(
+            catchError(this.handleError));
     }
 
     delete(id: string | undefined) {
         const options = { headers: this.getHeaders() };
 
         return this.http
-            .delete(`/api/v1/Events/Delete/${id}`, options)
-            .catch(this.handleError);
+            .delete(`/api/v1/Events/Delete/${id}`, options).pipe(
+            catchError(this.handleError));
     }
 }

@@ -1,5 +1,5 @@
-﻿import { } from "jasmine";
-import { defer } from "rxjs/observable/defer";
+import { } from "jasmine";
+import { defer as observableDefer } from "rxjs";
 
 import { EventsService } from "./events.service";
 import { Event } from "./event"
@@ -20,7 +20,7 @@ describe("EventsService", () => {
     it("index should return a list of events", () => {
         const events: Array<Event> = [event1, event2];
 
-        httpClientSpy.get.and.returnValue(defer(() => Promise.resolve(events)));
+        httpClientSpy.get.and.returnValue(observableDefer(() => Promise.resolve(events)));
 
         eventsService
             .index()
@@ -32,7 +32,7 @@ describe("EventsService", () => {
     });
 
     it("details should return an event", () => {
-        httpClientSpy.get.and.returnValue(defer(() => Promise.resolve(event1)));
+        httpClientSpy.get.and.returnValue(observableDefer(() => Promise.resolve(event1)));
 
         eventsService
             .details("1")
@@ -44,7 +44,7 @@ describe("EventsService", () => {
     });
 
     it("create should return an event", () => {
-        httpClientSpy.post.and.returnValue(defer(() => Promise.resolve(event1)));
+        httpClientSpy.post.and.returnValue(observableDefer(() => Promise.resolve(event1)));
 
         eventsService
             .create(event1)
@@ -56,7 +56,7 @@ describe("EventsService", () => {
     });
 
     it("edit should not return anything", () => {
-        httpClientSpy.put.and.returnValue(defer(() => Promise.resolve()));
+        httpClientSpy.put.and.returnValue(observableDefer(() => Promise.resolve()));
 
         eventsService
             .edit(event1)
@@ -68,7 +68,7 @@ describe("EventsService", () => {
     });
 
     it("delete should not return anything", () => {
-        httpClientSpy.delete.and.returnValue(defer(() => Promise.resolve()));
+        httpClientSpy.delete.and.returnValue(observableDefer(() => Promise.resolve()));
 
         eventsService
             .delete(event1.id)
