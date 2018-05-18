@@ -20,7 +20,7 @@ namespace community.UnitTests.Managers
                 event2 = new Event {Id = Guid.NewGuid(), Address = address},
                 event3 = new Event {Id = Guid.NewGuid(), Address = address};
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase("Index")
+                .UseInMemoryDatabase("EventManager_Index")
                 .Options;
 
             using (var context = new ApplicationDbContext(options))
@@ -48,7 +48,7 @@ namespace community.UnitTests.Managers
         {
             var id = Guid.NewGuid();
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase("Details")
+                .UseInMemoryDatabase("EventManager_Details")
                 .Options;
 
             using (var context = new ApplicationDbContext(options))
@@ -72,7 +72,7 @@ namespace community.UnitTests.Managers
         public async Task Details_Null_Id()
         {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase("Details_Null_Id")
+                .UseInMemoryDatabase("EventManager_Details_Null_Id")
                 .Options;
 
             using (var context = new ApplicationDbContext(options))
@@ -88,7 +88,7 @@ namespace community.UnitTests.Managers
         {
             Guid id;
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase("Create")
+                .UseInMemoryDatabase("EventManager_Create")
                 .Options;
 
             using (var context = new ApplicationDbContext(options))
@@ -111,7 +111,7 @@ namespace community.UnitTests.Managers
         public async Task Create_Null_Event()
         {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase("Create_Null_Event")
+                .UseInMemoryDatabase("EventManager_Create_Null_Event")
                 .Options;
 
             using (var context = new ApplicationDbContext(options))
@@ -127,7 +127,7 @@ namespace community.UnitTests.Managers
         {
             Guid id;
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase("Edit")
+                .UseInMemoryDatabase("EventManager_Edit")
                 .Options;
 
             using (var context = new ApplicationDbContext(options))
@@ -158,7 +158,7 @@ namespace community.UnitTests.Managers
         public async Task Edit_Null_Event()
         {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase("Edit_Null_Event")
+                .UseInMemoryDatabase("EventManager_Edit_Null_Event")
                 .Options;
 
             using (var context = new ApplicationDbContext(options))
@@ -173,7 +173,7 @@ namespace community.UnitTests.Managers
         public async Task Edit_Bad_Id()
         {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase("Edit_Bad_Id")
+                .UseInMemoryDatabase("EventManager_Edit_Bad_Id")
                 .Options;
             var Event = new Event();
 
@@ -190,7 +190,7 @@ namespace community.UnitTests.Managers
         {
             Guid id;
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase("Delete")
+                .UseInMemoryDatabase("EventManager_Delete")
                 .Options;
 
             using (var context = new ApplicationDbContext(options))
@@ -218,7 +218,7 @@ namespace community.UnitTests.Managers
         public async Task Delete_Null_Id()
         {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase("Delete_Null_Id")
+                .UseInMemoryDatabase("EventManager_Delete_Null_Id")
                 .Options;
 
             using (var context = new ApplicationDbContext(options))

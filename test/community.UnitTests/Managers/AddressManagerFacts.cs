@@ -19,7 +19,7 @@ namespace community.UnitTests.Managers
                 address2 = new Address {Id = Guid.NewGuid()},
                 address3 = new Address {Id = Guid.NewGuid()};
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase("Index")
+                .UseInMemoryDatabase("AddressManager_Index")
                 .Options;
 
             using (var context = new ApplicationDbContext(options))
@@ -47,7 +47,7 @@ namespace community.UnitTests.Managers
         {
             var id = Guid.NewGuid();
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase("Details")
+                .UseInMemoryDatabase("AddressManager_Details")
                 .Options;
 
             using (var context = new ApplicationDbContext(options))
@@ -71,7 +71,7 @@ namespace community.UnitTests.Managers
         public async Task Details_Null_Id()
         {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase("Details_Null_Id")
+                .UseInMemoryDatabase("AddressManager_Details_Null_Id")
                 .Options;
 
             using (var context = new ApplicationDbContext(options))
@@ -87,7 +87,7 @@ namespace community.UnitTests.Managers
         {
             Guid id;
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase("Create")
+                .UseInMemoryDatabase("AddressManager_Create")
                 .Options;
 
             using (var context = new ApplicationDbContext(options))
@@ -110,7 +110,7 @@ namespace community.UnitTests.Managers
         public async Task Create_Null_Address()
         {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase("Create_Null_Address")
+                .UseInMemoryDatabase("AddressManager_Create_Null_Address")
                 .Options;
 
             using (var context = new ApplicationDbContext(options))
@@ -126,7 +126,7 @@ namespace community.UnitTests.Managers
         {
             Guid id;
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase("Edit")
+                .UseInMemoryDatabase("AddressManager_Edit")
                 .Options;
 
             using (var context = new ApplicationDbContext(options))
@@ -157,7 +157,7 @@ namespace community.UnitTests.Managers
         public async Task Edit_Null_Address()
         {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase("Edit_Null_Address")
+                .UseInMemoryDatabase("AddressManager_Edit_Null_Address")
                 .Options;
 
             using (var context = new ApplicationDbContext(options))
@@ -172,7 +172,7 @@ namespace community.UnitTests.Managers
         public async Task Edit_Bad_Id()
         {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase("Edit_Bad_Id")
+                .UseInMemoryDatabase("AddressManager_Edit_Bad_Id")
                 .Options;
             var address = new Address {Id = Guid.NewGuid()};
 
@@ -189,7 +189,7 @@ namespace community.UnitTests.Managers
         {
             Guid id;
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase("Delete")
+                .UseInMemoryDatabase("AddressManager_Delete")
                 .Options;
 
             using (var context = new ApplicationDbContext(options))
@@ -217,7 +217,7 @@ namespace community.UnitTests.Managers
         public async Task Delete_Null_Id()
         {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase("Delete_Null_Id")
+                .UseInMemoryDatabase("AddressManager_Delete_Null_Id")
                 .Options;
 
             using (var context = new ApplicationDbContext(options))
