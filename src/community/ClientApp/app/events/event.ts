@@ -3,7 +3,7 @@ export class Event {
     id?: string;
     name?: string;
     details?: string;
-    date?: string;
+    date?: Date;
     userId?: string;
     addressId?: string;
     street?: string;
