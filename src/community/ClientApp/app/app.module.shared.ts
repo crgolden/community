@@ -1,7 +1,5 @@
 import { NgModule } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import { FormsModule } from "@angular/forms";
-import { HttpClientModule } from "@angular/common/http";
+
 import { RouterModule } from "@angular/router";
 import { AccountModule } from "./account/account.module"
 import { UsersModule } from "./users/users.module"
@@ -21,9 +19,6 @@ import { AppService } from "./app.service"
         HomeComponent
     ],
     imports: [
-        CommonModule,
-        HttpClientModule,
-        FormsModule,
         RouterModule.forRoot([
             { path: "", redirectTo: "Home", pathMatch: "full" },
             { path: "Home", component: HomeComponent },
